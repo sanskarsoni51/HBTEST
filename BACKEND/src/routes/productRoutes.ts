@@ -1,0 +1,18 @@
+import express from "express";
+import ProductRepository from "../Repository/ProductRepository.js";
+import AuthRepository from "../Repository/AuthRepository.js";
+import { uploadProductImages } from "../Repository/multer.js";
+import { log } from "console";
+
+const router = express.Router();
+
+router.get('/',ProductRepository.getAllProducts);
+router.get('/search',ProductRepository.searchProducts);
+router.get('/newProducts',ProductRepository.getNewProducts);
+router.get('/:productId',ProductRepository.getProductById);
+router.post('/',uploadProductImages,ProductRepository.createProduct);
+router.patch('/:productId',ProductRepository.updateProductById);
+router.patch('/:productId/img',uploadProductImages,ProductRepository.updateProductImagesById)
+router.delete('/:productId',ProductRepository.deleteProductById);
+
+export default router;
