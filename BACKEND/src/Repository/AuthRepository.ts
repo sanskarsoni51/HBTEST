@@ -21,7 +21,7 @@ export const signup = CatchAsync(async (req: Request, res: Response, next: NextF
   };
   res.cookie('jwt', token,cookieOptions);
   user.password = "";
-  res.status(201).json({ message: 'Signup successful', user });
+  res.status(201).json({ message: 'Signup successful', token });
 });
 
 // Local login

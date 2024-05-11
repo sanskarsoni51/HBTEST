@@ -12,7 +12,7 @@ const getProductById = catchAsync(async (req: Request, res: Response, next: Next
   if (!result) {
     return next(new AppError('Product not found', 404));
   }
-
+ 
   res.status(200).json({
     message: "success",
     data: result,
@@ -125,14 +125,14 @@ const getAllProducts = catchAsync(async (req: Request, res: Response, next: Next
   // console.log(req.query);
   const result = await features.query;
   const limit = req.query.limit || 1;
-  console.log(limit);
+  // console.log(limit);
   // console.log(features);
   // Count total number of products from the database instead of result length
   const totalProducts = await productModel.countDocuments();
 
   // Calculate total pages based on total number of products and specified limit
   const totalPages = Math.ceil(totalProducts / Number(limit));
-  console.log(totalPages);
+  // console.log(totalPages);
   res.status(200).json({
     message: "success",
     totalPages,

@@ -27,7 +27,7 @@ export const signup = CatchAsync((req, res, next) => __awaiter(void 0, void 0, v
     };
     res.cookie('jwt', token, cookieOptions);
     user.password = "";
-    res.status(201).json({ message: 'Signup successful', user });
+    res.status(201).json({ message: 'Signup successful', token });
 }));
 // Local login
 export const login = CatchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

@@ -107,13 +107,13 @@ const getAllProducts = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
     // console.log(req.query);
     const result = yield features.query;
     const limit = req.query.limit || 1;
-    console.log(limit);
+    // console.log(limit);
     // console.log(features);
     // Count total number of products from the database instead of result length
     const totalProducts = yield productModel.countDocuments();
     // Calculate total pages based on total number of products and specified limit
     const totalPages = Math.ceil(totalProducts / Number(limit));
-    console.log(totalPages);
+    // console.log(totalPages);
     res.status(200).json({
         message: "success",
         totalPages,
