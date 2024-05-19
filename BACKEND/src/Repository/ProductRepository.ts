@@ -7,7 +7,7 @@ import { NewProductRequestBody } from "../types/requestBody.js";
 
 const getProductById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const productId = req.params.productId;
-  const result = await productModel.findById(productId);
+  const result = await productModel.findOne({pid : productId});
 
   if (!result) {
     return next(new AppError('Product not found', 404));
