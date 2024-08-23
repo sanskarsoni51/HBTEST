@@ -7,7 +7,7 @@ export interface userSchema {
   // createdAt: Date;
   // blocked: boolean;
   address: Address[];
-  role: "admin" | "user";
+  role: "admin" | "user" | "none";
 }
 
 export interface ProductSchema {

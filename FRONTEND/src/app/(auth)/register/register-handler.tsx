@@ -15,8 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { useRegisterUserMutation } from "@/redux/api/authApi";
+import { redirect } from "next/navigation";
 
-const registerSchema = z.object({
+const registerSchema = z
+  .object({
     name: z.string().min(1, "Full name is required").max(100),
     email: z
       .string()
@@ -65,6 +67,7 @@ export function RegisterInner() {
         variant: "default",
         duration: 2000,
       });
+      redirect("/");
     }
 
     if (isError) {
@@ -102,75 +105,79 @@ export function RegisterInner() {
   };
 
   return (
-  <Form {...form}>
-    <form onSubmit={handleSubmit(onSubmit)}
-      className="text-brown text-xl font-semibold"
-    >
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem className="my-3">
-            <FormLabel className="flex flex-row font-semibold">
-              Email:
-              <FormMessage className="ml-3 font-medium" />
-            </FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="tyler.durden@fightclub.com" />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="name"
-        render={({ field }) => (
-          <FormItem className="my-3">
-            <FormLabel className="flex flex-row font-semibold">
-              Name:
-              <FormMessage className="ml-3 font-medium" />
-            </FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="Tyler Durden" />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="password"
-        render={({ field }) => (
-          <FormItem className="my-3">
-            <FormLabel className="flex flex-row font-semibold">
-              Password:
-              <FormMessage className="ml-3 font-medium" />
-            </FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="You don't talk about it." />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="passwordConfirm"
-        render={({ field }) => (
-          <FormItem className="my-3">
-            <FormLabel className="flex flex-row font-semibold">
-              Confirm Parrsword:
-              <FormMessage className="ml-3 font-medium" />
-            </FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="Can we have it again. Please?" />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      <Button className="w-full mb-3" type="submit">
-        Register
-      </Button>
-    </form>
-  </Form>
-);
-
-};
+    <Form {...form}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="text-brown text-xl font-semibold"
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="my-3">
+              <FormLabel className="flex flex-row font-semibold">
+                Email:
+                <FormMessage className="ml-3 font-medium" />
+              </FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="tyler.durden@fightclub.com" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="my-3">
+              <FormLabel className="flex flex-row font-semibold">
+                Name:
+                <FormMessage className="ml-3 font-medium" />
+              </FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Tyler Durden" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="my-3">
+              <FormLabel className="flex flex-row font-semibold">
+                Password:
+                <FormMessage className="ml-3 font-medium" />
+              </FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="You don't talk about it." />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="passwordConfirm"
+          render={({ field }) => (
+            <FormItem className="my-3">
+              <FormLabel className="flex flex-row font-semibold">
+                Confirm Parrsword:
+                <FormMessage className="ml-3 font-medium" />
+              </FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="password"
+                  placeholder="Can we have it again. Please?"
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <Button className="w-full mb-3" type="submit">
+          Register
+        </Button>
+      </form>
+    </Form>
+  );
+}

@@ -24,98 +24,91 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
     useRemoveFromCartMutation();
 
   return (
-    <div className="w-full relative max-h-screen overflow-y-auto">
-      <div className="md:grid text-center grid-cols-4 gap-2 hidden">
-        <div className="text-lg col-span-2">Your Cart</div>
-        <div className="text-lg">Quantity</div>
-        <div className="text-lg ">Price</div>
-      </div>
-      {/* row1 */}
-
-      {cart &&
-        Object.entries(cart.products).map(([productId, productData]) => (
-          <div
-            key={productId}
-            className="h-[170px] gap-2 my-2 md:my-2 lg:my-5 grid grid-cols-3"
-          >
-            <Image
-              src={productData.product.images[0]}
-              alt="pic"
-              width={100}
-              height={100}
-              className="rounded-md m-2 mx-4"
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3  col-span-2">
-              <div className="font-semibold pt-5 text-lg w-full h-[100px] pr-14 ">
-                <Link
-                  href={`/product/+${productId}`}
-                  className="hover:underline line-clamp-2 h-[50px]"
+    <div className="w-full relative overflow-y-auto h-full max-h-screen">
+      {cart ? (
+        <>
+          <div className="mx-14">Your Cart</div>
+          <hr className="mx-14 my-3" />
+          <div className="flex  flex-col gap-3">
+            {Object.entries(cart.products).map(([productId, productData]) => (
+              <div className="h-[130px] mx-14 flex flex-row" key={productId}>
+                <div className="w-[90%] bg-pale rounded-md overflow-hidden flex flex-row">
+                  <Image
+                    src={productData.product.images[0]}
+                    width={100}
+                    height={100}
+                    alt="productImg"
+                    className="rounded-full object-cover aspect-square mx-10 my-[15px]"
+                  />
+                  <div className="w-[20%] flex h-full justify-center flex-col mx-3">
+                    <Link
+                      href={`/product/+${productId}`}
+                      className="text-lg font-semibold"
+                    >
+                      {productData.product.productName}
+                    </Link>
+                    <span className="line-clamp-2 text-sm">
+                      {productData.product.description}
+                    </span>
+                  </div>
+                  <div className="flex items-center mx-3">
+                    <div className="border-2 w-[100px] h-[33px] border-brown flex flex-row justify-between">
+                      <button
+                        className="h-full aspect-square bg-lbrown flex justify-center items-center text-2xl text-white"
+                        onClick={() => {
+                          if (productData.quantity == 1) {
+                            removeqty(productData.product.pid);
+                          } else if (productData.quantity > 1) {
+                            changeqty({
+                              itemId: productData.product.pid,
+                              quantity: productData.quantity - 1,
+                            });
+                          } else {
+                            toast({
+                              title: "Error",
+                              duration: 2000,
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                      >
+                        -
+                      </button>
+                      <span className="h-full text-center flex justify-center items-center">
+                        {productData.quantity}
+                      </span>
+                      <button
+                        className="h-full aspect-square bg-lbrown flex justify-center items-center text-2xl text-white"
+                        onClick={() => {
+                          changeqty({
+                            itemId: productData.product.pid,
+                            quantity: productData.quantity + 1,
+                          });
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mx-5 flex justify-center items-center text-lg">
+                    {"₹" + productData.quantity * productData.product.price} /-
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    removeqty(productData.product.pid);
+                  }}
+                  className="text-brown justify-center items-center "
                 >
-                  {productData.product.productName}
-                </Link>
-
-                <span className="text-sm font-medium md:hidden">
-                  {"Choose " +
-                    productData.quantity +
-                    " for ₹" +
-                    productData.quantity * productData.product.price}
-                </span>
+                  <Cross1Icon className="w-10 h-6"></Cross1Icon>
+                </button>
               </div>
-              <div className="flex items-center">
-                <div className="flex flex-row justify-center items-center gap-2 m-2">
-                  <Button
-                    onClick={() => {
-                      if (productData.quantity == 1) {
-                        removeqty(productData.product.pid);
-                      } else if (productData.quantity > 1) {
-                        changeqty({
-                          itemId: productData.product.pid,
-                          quantity: productData.quantity - 1,
-                        });
-                      } else {
-                        toast({
-                          title: "Error",
-                          duration: 2000,
-                          variant: "destructive",
-                        });
-                      }
-                    }}
-                    className="bg-pale hover:bg-pale text-brown md:text-xl"
-                  >
-                    -
-                  </Button>
-                  {productData.quantity}
-                  <Button
-                    onClick={() => {
-                      changeqty({
-                        itemId: productData.product.pid,
-                        quantity: productData.quantity + 1,
-                      });
-                    }}
-                    className="bg-pale hover:bg-pale text-brown md:text-xl"
-                  >
-                    +
-                  </Button>
-                </div>
-                <div className="ml-5 md:hidden">
-                  {"₹" + productData.quantity * productData.product.price}/-
-                </div>
-              </div>
-              <div className="ml-5 hidden md:flex items-center justify-center">
-                {"₹" + productData.quantity * productData.product.price}/-
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                removeqty(productData.product.pid);
-              }}
-              className="text-brown absolute right-4 mt-2 "
-            >
-              <Cross1Icon className="w-10 h-6"></Cross1Icon>
-            </button>
-            <hr className="col-span-3" />
+            ))}
           </div>
-        ))}
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

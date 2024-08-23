@@ -9,8 +9,11 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Card, CardContent } from "../ui/card";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const MainCourousel = () => {
+  const redirect = useRouter();
   return (
     <Carousel
       className="w-full"
@@ -30,9 +33,12 @@ const MainCourousel = () => {
                 Tradition in every sparkle, stories in every detail. Adorn
                 yourself with the legacy of timeless beauty.
               </span>
-              <button className=" md:text-2xl lg:text-3xl xl:text:4xl p-3 rounded-md text-gold mt-6 bg-brown ">
+              <Link
+                className=" md:text-2xl lg:text-3xl xl:text:4xl p-3 rounded-md text-gold mt-6 bg-brown"
+                href={"/shop"}
+              >
                 Shop Now
-              </button>
+              </Link>
             </div>
             <div
               style={{ backgroundImage: `url("/bs.jpg")` }}
@@ -47,9 +53,12 @@ const MainCourousel = () => {
                 Tradition in every sparkle, stories in every detail. Adorn
                 yourself with the legacy of timeless beauty.
               </span>
-              <button className=" md:text-2xl lg:text-3xl xl:text:4xl p-3 rounded-md text-gold mt-6 bg-brown ">
+              <Link
+                href={"/shop"}
+                className=" md:text-2xl lg:text-3xl xl:text:4xl p-3 rounded-md text-gold mt-6 bg-brown "
+              >
                 Shop Now
-              </button>
+              </Link>
             </div>
             <div
               style={{ backgroundImage: `url("/bs.jpg")` }}
@@ -58,10 +67,8 @@ const MainCourousel = () => {
           </div>
         </CarouselItem>
       </CarouselContent>
-      <div className="flex justify-between px-4 absolute w-full top-1/2">
-        <CarouselPrevious className="bg-slate-50/25" />
-        <CarouselNext className="bg-slate-50/25" />
-      </div>
+      <CarouselPrevious className="bg-slate-50/25 left-16 hidden md:flex" />
+      <CarouselNext className="bg-slate-50/25 right-16 hidden md:flex" />
     </Carousel>
   );
 };

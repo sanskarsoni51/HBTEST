@@ -21,8 +21,10 @@ export const authApi = createApi({
           await queryFulfilled;
           sessionStorage.setItem("token", (await queryFulfilled).data?.token);
           await dispatch(userApi.endpoints.getUser.initiate(null));
-        } catch (error:any) {
-          throw new Error(error.message?error.message:"Error occured  while logging in");
+        } catch (error: any) {
+          throw new Error(
+            error.message ? error.message : "Error occured  while logging in",
+          );
         }
       },
     }),
@@ -36,8 +38,13 @@ export const authApi = createApi({
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+          sessionStorage.setItem("token", (await queryFulfilled).data?.token);
           await dispatch(userApi.endpoints.getUser.initiate(null));
-        } catch (error) {}
+        } catch (error: any) {
+          throw new Error(
+            error.message ? error.message : "Error occured  while logging in",
+          );
+        }
       },
     }),
     logoutUser: builder.mutation<void, void>({

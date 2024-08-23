@@ -35,7 +35,7 @@ const ProfilePhotoUpdate = ({ picsrc }: { picsrc: string }) => {
   return (
     <div className="flex flex-row gap-4 items-center">
       <Image
-        src={picsrc}
+        src="/cat2.jpg"
         width={100}
         height={100}
         alt="profilePhoto"

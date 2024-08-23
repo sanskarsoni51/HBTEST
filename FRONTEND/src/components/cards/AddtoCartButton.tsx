@@ -23,7 +23,8 @@ const AddtoCartButton = ({ productToAdd }: Props) => {
       duration: 2000,
     });
   }
-  if (inCart.products[productToAdd.pid]) {
+
+  if (inCart.products && inCart.products[productToAdd.pid]) {
     return (
       <Button
         className="w-[120px] text-pale bg-lbrown h-[30px]"

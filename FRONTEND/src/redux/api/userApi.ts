@@ -24,17 +24,19 @@ export const userApi = createApi({
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
           const user = (await queryFulfilled).data.data;
-          dispatch(setAuthState(true));
-          dispatch(
-            setAuthUser({
-              email: user.email,
-              name: user.name,
-              password: "",
-              address: user.address,
-              profilePhoto: user.profilePhoto,
-              role: user.role,
-            }),
-          );
+          if (user) {
+            dispatch(setAuthState(true));
+            dispatch(
+              setAuthUser({
+                email: user.email,
+                name: user.name,
+                password: "",
+                address: user.address,
+                profilePhoto: user.profilePhoto,
+                role: user.role,
+              }),
+            );
+          }
           await queryFulfilled;
           await dispatch(userApi.endpoints.getCart.initiate(null));
         } catch (error) {

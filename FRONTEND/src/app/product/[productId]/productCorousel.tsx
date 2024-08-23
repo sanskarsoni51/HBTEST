@@ -23,7 +23,7 @@ const ProductCorousel = ({images}:Props) => {
               <CarouselItem key={i}>
                 <div className="p-1 w-full h-[560px] flex justify-center items-center">
                   <Image
-                    src={src}
+                    src="/cat2.jpg"
                     alt={`Product image ${i + 1}`}
                     width={1000}
                     height={720}

@@ -18,42 +18,24 @@ const menu = [
       title: "Men",
       submenu: [
           {
-              title: "Swords",
+              title: "Rings",
               hrf:"/shop",
               img: "next.svg",
               desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
           },
           {
-              title: "Swords",
+              title: "Bracelate",
               hrf:"/shop",
               img: "next.svg",
               desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
           },
           {
-              title: "Swords",
+              title: "Chains",
               hrf:"/shop",
               img: "next.svg",
               desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
           },
 
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
           {
               title: "Swords",
               hrf:"/shop",
@@ -172,7 +154,7 @@ const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <Image src={img} alt={title} width={32} height={32} />
+          <Image src="/cat2.jpg" alt={title} width={32} height={32} />
           <div className="block ml-2">
             <div className="text-sm font-semibold leading-none">{title}</div>
             <p className="line-clamp-2 text-xs leading-snug text-gray-700 ">

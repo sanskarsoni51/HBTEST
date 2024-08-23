@@ -8,9 +8,12 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cookieParser from "cookie-parser";
 import cartRoutes from "./routes/cartRoutes.js";
+import path from "path";
 
 
 const app = express();
+const _dirname= path.dirname("");
+const buildPath = path.join(_dirname,"../frontend/")
 app.use(express.json());
 app.use(cookieParser());
 

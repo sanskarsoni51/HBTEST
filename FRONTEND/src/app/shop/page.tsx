@@ -15,6 +15,7 @@ import {
 } from "@/redux/api/prductsApi";
 import { ProductSchema } from "@/schema/schema";
 import { Input } from "@/components/ui/input";
+import PageLoader from "@/components/Loader/ShopLoader";
 
 const Shop = () => {
   const [product, setProduct] = useState<Array<ProductSchema> | null>(null);
@@ -107,7 +108,7 @@ const Shop = () => {
     return <div>Network Error. Please refresh or try again later!-- </div>;
   }
   if (isLoading) {
-    return <div>Loading</div>;
+    return <PageLoader />;
   }
   if (isSuccess) {
     return (

@@ -27,7 +27,7 @@ export function ProfileButtonD() {
       <DropdownMenuTrigger className="hidden md:block">
         <Avatar className="h-[28px] w-[30px]">
           {user.profilePhoto !== "" ? (
-            <AvatarImage src={user.profilePhoto} />
+            <AvatarImage src="/cat2.jpg" />
           ) : (
             <UserIcon className="h-[28px] w-[30px]"></UserIcon>
           )}

@@ -14,12 +14,12 @@ const Register = () => {
     getUser(null);
   }, []);
   if (isSuccess) {
-  }
-  if (data) {
-    if (user?.role === "admin") {
-      redirect("/admin/dashboard");
-    } else {
-      redirect("/");
+    if (data) {
+      if (user?.role === "admin") {
+        redirect("/admin/dashboard");
+      } else if (user?.role === "user") {
+        redirect("/");
+      }
     }
   } else {
     return (

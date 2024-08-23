@@ -24,17 +24,27 @@ export const cartApi = createApi({
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          const cart = (await queryFulfilled).data.data;
-          dispatch(
-            setCart({
-              products: cart.products,
-              deliveryCharges: cart.deliveryCharges,
-              gst: cart.gst,
-              payablePrice: cart.payablePrice,
-              totalPrice: cart.totalPrice,
-              totalQuantity: cart.totalQuantity,
-            }),
-          );
+          if ((await queryFulfilled).data.status == 401) {
+            toast({
+              title: "Please Login First",
+              variant: "destructive",
+              duration: 1000,
+            });
+          } else {
+            const cart = (await queryFulfilled).data.data;
+            if (cart) {
+              dispatch(
+                setCart({
+                  products: cart.products,
+                  deliveryCharges: cart.deliveryCharges,
+                  gst: cart.gst,
+                  payablePrice: cart.payablePrice,
+                  totalPrice: cart.totalPrice,
+                  totalQuantity: cart.totalQuantity,
+                }),
+              );
+            }
+          }
         } catch (error) {
           toast({
             title: "Error",

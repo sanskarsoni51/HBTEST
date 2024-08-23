@@ -9,11 +9,12 @@ import {
 import Card1 from "../cards/Card1";
 import { useGetBestSellerQuery } from "@/redux/api/prductsApi";
 import { ProductSchema } from "@/schema/schema";
+import PageLoader from "../Loader/PageLoader";
 
 const Bestseller = () => {
   const temproducts = useGetBestSellerQuery(null);
   if (temproducts.isError) return <>Network Error</>;
-  if (temproducts.isLoading) return <>Loading</>;
+  if (temproducts.isLoading) return <PageLoader />;
   if (temproducts.isSuccess) {
     if (temproducts.data) {
       const product: ProductSchema[] = [];
@@ -56,7 +57,7 @@ const Bestseller = () => {
                 );
               })}
             </CarouselContent>
-            <div className="flex justify-between px-4 absolute w-[90%] top-1/2">
+            <div className="justify-between px-4 absolute w-[90%] top-1/2 hidden md:flex">
               <CarouselPrevious />
               <CarouselNext />
             </div>

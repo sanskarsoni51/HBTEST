@@ -17,7 +17,7 @@ function LoginPage() {
     if (data) {
       if (user?.role === "admin") {
         redirect("/admin/dashboard");
-      } else {
+      } else if (user?.role === "user") {
         redirect("/");
       }
     }

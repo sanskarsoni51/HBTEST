@@ -18,7 +18,7 @@ function Card2({ img, title, desc, price, shoplink }: CardProps) {
       style={{ backgroundImage: `url("/card2bg.jpg")` }}
     >
       <Image
-        src={bs}
+        src="/cat2.jpg"
         alt={title}
         className="mt-6 sm:mt-8 rounded-md w-[150px] aspect-[2/3] sm:w-[180px] object-cover"
       />

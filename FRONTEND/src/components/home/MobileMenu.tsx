@@ -1,6 +1,6 @@
 "use client";
 import { Bars3BottomRightIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -10,118 +10,126 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { useAppSelector } from "@/redux/store";
+import { useLazyGetUserQuery } from "@/redux/api/userApi";
 
 const menu = [
   {
-      title: "Men",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
+    title: "Men",
+    submenu: [
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
 
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "next.svg",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+    ],
   },
   {
-      title: "Female",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
+    title: "Female",
+    submenu: [
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+    ],
   },
   {
-      title: "Traditional",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
+    title: "Traditional",
+    submenu: [
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+    ],
   },
   {
-      title: "Immitated",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
+    title: "Immitated",
+    submenu: [
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+    ],
   },
   {
-      title: "1g-Gold",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
-  }
-]
+    title: "1g-Gold",
+    submenu: [
+      {
+        title: "Swords",
+        hrf: "/shop",
+        img: "",
+        desc: "sdfaidf f aisdfs dfisdgf isdhf hdf",
+      },
+    ],
+  },
+];
 
 // this is for future use as i want optimize the barIcon(only) as client side
 const Mobilebar = () => {
   const [navOpen, setNavOpen] = useState(true);
-  const [user, setUser] = useState(true);
+  const [getUser, { isLoading, isSuccess, isError }] = useLazyGetUserQuery();
+  useEffect(() => {
+    getUser(null);
+  }, []);
+
+  const isUser = useAppSelector((state) => state.auth.authState);
+  const user = useAppSelector((state) => state.auth.user);
   return (
     <>
       <div
@@ -133,23 +141,44 @@ const Mobilebar = () => {
       >
         <Accordion type="single" collapsible className="w-full mx-3">
           <AccordionItem value={"-1".toString()}>
-            <AccordionTrigger className="mx-4 font-semibold">My Profile</AccordionTrigger>
+            <AccordionTrigger className="mx-4 font-semibold">
+              My Profile
+            </AccordionTrigger>
             <AccordionContent className="mx-4 font-semibold">
-              {user ? (
+              {isUser ? (
                 <ul className="font-medium">
                   <li>
-                    <Link href="/profile" className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                    <Link
+                      href="/profile"
+                      className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
                       Profile
                     </Link>
                   </li>
                   <li>
-                    <Link href="" className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">Logout</Link>
+                    <Link
+                      href="/orders"
+                      className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      Orders
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/logout"
+                      className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      Logout
+                    </Link>
                   </li>
                 </ul>
               ) : (
                 <ul className="">
                   <li>
-                    <Link href="/login" className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                    <Link
+                      href="/login"
+                      className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
                       Login
                     </Link>
                   </li>
@@ -157,7 +186,7 @@ const Mobilebar = () => {
               )}
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="x" ></AccordionItem>
+          <AccordionItem value="x"></AccordionItem>
 
           {menu.map((e, i) => {
             return (
@@ -175,7 +204,7 @@ const Mobilebar = () => {
                             className="flex flex-row select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                           >
                             <Image
-                              src={se.img}
+                              src="/cat2.jpg"
                               alt={se.title}
                               width={32}
                               height={32}

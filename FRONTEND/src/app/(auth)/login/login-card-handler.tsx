@@ -112,7 +112,11 @@ export function LoginInner() {
                 <FormMessage className="ml-3 font-medium" />
               </FormLabel>
               <FormControl>
-                <Input {...field} placeholder="You don't talk about it." />
+                <Input
+                  {...field}
+                  type="password"
+                  placeholder="You don't talk about it."
+                />
               </FormControl>
             </FormItem>
           )}
