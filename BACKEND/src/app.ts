@@ -8,11 +8,16 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cookieParser from "cookie-parser";
 import cartRoutes from "./routes/cartRoutes.js";
+import path from "path";
 
 
 const app = express();
+const _dirname= path.dirname("");
+const buildPath = path.join(_dirname,"../frontend/.next");
+ 
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static(buildPath))
 
 const corsOptions = {
     origin: true, // Allow requests from this origin
@@ -61,7 +66,7 @@ app.use('/uploads',express.static('uploads'));
 app.use(globalErrorHandler);
 
 
-const port = 5000;
+const port = process.env.Port || 80;
 app.listen(port,()=>{
     console.log(`server is running at the port ${port}`);
 })

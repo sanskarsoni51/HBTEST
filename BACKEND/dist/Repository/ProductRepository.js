@@ -13,7 +13,7 @@ import APIFeatures from "../utels/apiFeatures.js";
 import catchAsync from "../utels/CatchAsync.js";
 const getProductById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.productId;
-    const result = yield productModel.findById(productId);
+    const result = yield productModel.findOne({ pid: productId });
     if (!result) {
         return next(new AppError('Product not found', 404));
     }
