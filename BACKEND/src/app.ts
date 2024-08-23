@@ -14,7 +14,7 @@ import path from "path";
 const app = express();
 const _dirname= path.dirname("");
 const buildPath = path.join(_dirname,"../frontend/.next");
- 
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(buildPath))
@@ -66,7 +66,7 @@ app.use('/uploads',express.static('uploads'));
 app.use(globalErrorHandler);
 
 
-const port = process.env.Port || 80;
+const port = 5000;
 app.listen(port,()=>{
     console.log(`server is running at the port ${port}`);
 })

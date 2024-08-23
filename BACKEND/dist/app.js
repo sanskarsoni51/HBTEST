@@ -50,7 +50,7 @@ app.use('/cart', cartRoutes);
 app.use('/uploads', express.static('uploads'));
 // handling all the errors that are not caught by specific handlers
 app.use(globalErrorHandler);
-const port = process.env.Port || 80;
+const port = 5000;
 app.listen(port, () => {
     console.log(`server is running at the port ${port}`);
 });
