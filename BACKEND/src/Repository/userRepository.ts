@@ -14,9 +14,6 @@ const getUserById = catchAsync(async (req: Request, res: Response, next: NextFun
   if (!result) {
     return next(new AppError('User not found', 404));
   }
-  const url = `http://192.168.67.172:5000/${result.profilePhoto}`;
-  result.profilePhoto = url;
-
   res.status(200).json({
     message: "success",
     data: result,
