@@ -35,7 +35,7 @@ const createUser = catchAsync((req, res, next) => __awaiter(void 0, void 0, void
 }));
 const updateUserById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
-    console.log(req.body);
+    // console.log(req.body);
     const result = yield userModel.findByIdAndUpdate(userId, req.body, {
         new: true,
         runValidators: true,
@@ -76,24 +76,23 @@ const getMe = (req, res, next) => {
 };
 const updateProfilePhoto = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = new ObjectId(req.params.userId);
-    console.log(req.file);
+    // console.log(req.file);
     // Check if files were uploaded
     if (!req.file) {
         return res.status(400).json({ message: 'No images uploaded' });
     }
-    const image = req.file.path;
+    const image = req.file.location;
     const result = yield userModel.findByIdAndUpdate(userId, {
         profilePhoto: image
     }, {
         new: true,
         runValidators: true
     });
-    console.log(result);
+    // console.log(result);
     if (!result) {
         return next(new AppError('User not found', 404));
     }
-    const url = `http://192.168.188.172:5000/${result.profilePhoto}`;
-    result.profilePhoto = url;
+    // result.profilePhoto = url;
     res.status(200).json({
         message: "success",
         data: result,

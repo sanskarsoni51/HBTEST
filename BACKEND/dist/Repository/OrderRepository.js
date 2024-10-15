@@ -46,7 +46,7 @@ const createOrder = catchAsync((req, res, next) => __awaiter(void 0, void 0, voi
     }
     const user = req.params.userId;
     const cart = yield CartModel.findOne({ user });
-    console.log(user, cart);
+    // console.log(user,cart);
     const cartId = cart === null || cart === void 0 ? void 0 : cart._id;
     const { paymentId, status, shippingAddress } = req.body;
     const createdOrder = yield Order.create({ userId: user, cartId, paymentId, status, shippingAddress });

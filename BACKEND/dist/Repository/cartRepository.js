@@ -149,7 +149,7 @@ const updateCartQuantity = catchAsync((req, res, next) => __awaiter(void 0, void
         return next(new AppError('Cart not found', 404));
     }
     else {
-        console.log(cart);
+        // console.log(cart);
         // Check if the product is in the cart
         if (cart.products && cart.products.has(pid)) {
             // Update the quantity of the product in the cart

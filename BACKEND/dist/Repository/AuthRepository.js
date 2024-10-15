@@ -64,7 +64,7 @@ export const protect = CatchAsync((req, res, next) => __awaiter(void 0, void 0, 
     // } else 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
-        console.log("bearer", token);
+        // console.log("bearer",token);
     }
     if (!token) {
         return next(new AppError('You are not logged in! Please login.', 401));

@@ -52,7 +52,7 @@ const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, v
 }));
 const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.productId;
-    console.log(req.body);
+    // console.log(req.body);
     const updatedProduct = yield productModel.findByIdAndUpdate(productId, req.body, {
         new: true,
         runValidators: true,
@@ -74,8 +74,11 @@ const updateProductImagesById = catchAsync((req, res, next) => __awaiter(void 0,
     }
     // Get the uploaded images
     const images = req.files["images"];
+    // console.log(images);
     // Get the paths of the uploaded images
-    const imagePaths = images.map((image) => image.path);
+    const imagePaths = images.map((image) => { return image.location || ''; });
+    // const imagePaths = images.map((image: Express.Multer.File) => image.location);
+    // console.log(imagePaths);
     // Update the product with the given productId to replace its images
     const updatedProduct = yield productModel.findByIdAndUpdate(productId, { $push: { images: { $each: imagePaths } } }, {
         new: true,
