@@ -47,7 +47,7 @@ const createOrder = catchAsync(async (req: Request, res: Response, next: NextFun
   }
   const user = req.params.userId;
   const cart = await CartModel.findOne({ user });
-  console.log(user,cart);
+  // console.log(user,cart);
   const cartId = cart?._id;
   
   const { paymentId, status, shippingAddress } = req.body;
