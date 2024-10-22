@@ -1,84 +1,109 @@
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Cross1Icon, CrossCircledIcon } from "@radix-ui/react-icons";
+import { Cross1Icon } from "@radix-ui/react-icons";
 import { CartSchema } from "@/schema/schema";
 import {
   useManipulateQuantityMutation,
   useRemoveFromCartMutation,
 } from "@/redux/api/cartApi";
 import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 
 interface CartProps {
   cart: CartSchema;
   updateCart: (cart: CartSchema) => void;
 }
 
-const CartTable = ({ cart, updateCart }: CartProps) => {
-  const [updatedCart, setUpdatedCart] = useState<CartSchema>(cart);
+const formatDate = (date: Date): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  };
+  return date.toLocaleDateString(undefined, options); // Format the date
+};
 
-  const [changeqty, { isSuccess: qtychanged, isError: errorqty }] =
-    useManipulateQuantityMutation();
-  const [removeqty, { isSuccess: qtyrmvd, isError: errormvd }] =
-    useRemoveFromCartMutation();
+const CartTable = ({ cart, updateCart }: CartProps) => {
+  // Calculate the delivery dates
+  const deliveryDate7Days = new Date();
+  deliveryDate7Days.setDate(deliveryDate7Days.getDate() + 7); // 7 days later
+
+  const deliveryDate10Days = new Date();
+  deliveryDate10Days.setDate(deliveryDate10Days.getDate() + 10); // 10 days later
+  const [changeqty] = useManipulateQuantityMutation();
+  const [removeqty] = useRemoveFromCartMutation();
 
   return (
-    <div className="w-full relative overflow-y-auto h-full max-h-screen">
-      {cart ? (
-        <>
-          <div className="mx-14">Your Cart</div>
-          <hr className="mx-14 my-3" />
-          <div className="flex  flex-col gap-3">
-            {Object.entries(cart.products).map(([productId, productData]) => (
-              <div className="h-[130px] mx-14 flex flex-row" key={productId}>
-                <div className="w-[90%] bg-pale rounded-md overflow-hidden flex flex-row">
-                  <Image
-                    src={productData.product.images[0]}
-                    width={100}
-                    height={100}
-                    alt="productImg"
-                    className="rounded-full object-cover aspect-square mx-10 my-[15px]"
-                  />
-                  <div className="w-[20%] flex h-full justify-center flex-col mx-3">
-                    <Link
-                      href={`/product/+${productId}`}
-                      className="text-lg font-semibold"
-                    >
-                      {productData.product.productName}
-                    </Link>
-                    <span className="line-clamp-2 text-sm">
-                      {productData.product.description}
-                    </span>
+    <section className="w-full relative overflow-y-auto h-full max-h-screen">
+      <div className="px-2 py-2">
+        <div className="flex flex-col items-center">
+          <div className="bg-card rounded-lg shadow-lg w-full">
+            <div className="border-b-2 border-lbrown p-6">
+              <h5 className="">
+                CART - {Object.keys(cart.products).length} items
+              </h5>
+            </div>
+            <div className="p-4">
+              {Object.entries(cart.products).map(([productId, productData]) => (
+                <div
+                  className="flex flex-row mb-4 border-b pb-4"
+                  key={productId}
+                >
+                  <div className="w-1/4">
+                    {/* Image */}
+                    <div className="relative w-full h-32">
+                      <Image
+                        src={productData.product.images[0]} // Assuming you have an image URL
+                        fill
+                        alt={productData.product.productName}
+                        className="object-cover rounded"
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center mx-3">
-                    <div className="border-2 w-[100px] h-[33px] border-brown flex flex-row justify-between">
+
+                  <div className="flex-grow mx-4">
+                    {/* Product Info */}
+                    <p className="text-lg font-semibold">
+                      {productData.product.productName}
+                    </p>
+                    <Button
+                      type="button"
+                      className="bg-brown rounded hover:bg-red-600 transition duration-200 mt-8"
+                      onClick={() => removeqty(productData.product.pid)}
+                    >
+                      REMOVE
+                    </Button>
+                  </div>
+
+                  <div className="flex flex-col justify-center items-center w-1/4">
+                    {/* Quantity */}
+                    <div className="flex items-center mb-2">
                       <button
-                        className="h-full aspect-square bg-lbrown flex justify-center items-center text-2xl text-white"
+                        className="bg-brown text-white px-3 py-0.5 rounded-l"
                         onClick={() => {
-                          if (productData.quantity == 1) {
-                            removeqty(productData.product.pid);
-                          } else if (productData.quantity > 1) {
+                          if (productData.quantity > 1) {
                             changeqty({
                               itemId: productData.product.pid,
                               quantity: productData.quantity - 1,
                             });
                           } else {
-                            toast({
-                              title: "Error",
-                              duration: 2000,
-                              variant: "destructive",
-                            });
+                            removeqty(productData.product.pid);
                           }
                         }}
                       >
                         -
                       </button>
-                      <span className="h-full text-center flex justify-center items-center">
-                        {productData.quantity}
-                      </span>
+                      <input
+                        min="0"
+                        name="quantity"
+                        value={productData.quantity}
+                        type="number"
+                        className="border-t border-b border-gray-300 text-center w-12 h-7"
+                        readOnly
+                      />
                       <button
-                        className="h-full aspect-square bg-lbrown flex justify-center items-center text-2xl text-white"
+                        className="bg-brown text-white px-3 py-0.5 rounded-r"
                         onClick={() => {
                           changeqty({
                             itemId: productData.product.pid,
@@ -89,27 +114,19 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
                         +
                       </button>
                     </div>
-                  </div>
-                  <div className="mx-5 flex justify-center items-center text-lg">
-                    {"₹" + productData.quantity * productData.product.price} /-
+
+                    {/* Price */}
+                    <p className="text-lg font-semibold">
+                      ₹{productData.quantity * productData.product.price} /-
+                    </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    removeqty(productData.product.pid);
-                  }}
-                  className="text-brown justify-center items-center "
-                >
-                  <Cross1Icon className="w-10 h-6"></Cross1Icon>
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </>
-      ) : (
-        <></>
-      )}
-    </div>
+        </div>
+      </div>
+    </section>
   );
 };
 
