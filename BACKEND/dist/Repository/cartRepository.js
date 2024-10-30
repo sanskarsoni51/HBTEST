@@ -66,36 +66,40 @@ const addToCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 
     if (req.user && req.user._id) {
         req.params.userId = req.user._id.toString();
     }
-    // console.log(req.params.userId);
     const pid = req.body.pid;
+    const selectedVariant = req.body.variant; // Assuming variant is passed in request body
     const user = req.params.userId;
-    // console.log(pid);
     const cart = yield CartModel.findOne({ user });
-    // console.log(cart);
     const product = yield Product.findOne({ pid });
-    // console.log(product);
     if (!product) {
         return next(new AppError('Product not found', 404));
     }
-    // Check if the product is already in the cart
+    // Check if the selected variant exists
+    const variant = product.variants.find((v) => v.color === selectedVariant.color);
+    if (!variant) {
+        return next(new AppError('Variant not found', 404));
+    }
+    // Check if the variant has stock
+    if (variant.stock <= 0) {
+        return next(new AppError('Variant out of stock', 400));
+    }
     if (cart) {
-        // Check if the product is already in the cart
         if (cart.products && cart.products.has(pid)) {
-            return next(new AppError('Product already exists in the cart', 400));
+            const cartProduct = cart.products.get(pid);
+            // Check if the existing product's variants contain the selected variant color
+            const existingVariant = (cartProduct === null || cartProduct === void 0 ? void 0 : cartProduct.variant.color) === selectedVariant.color;
+            if (existingVariant) {
+                return next(new AppError('Product variant already exists in the cart', 400));
+            }
         }
-        // Add the product to the cart
+        // Add the product variant to the cart
         cart.products = cart.products || new Map();
-        cart.products.set(pid, { product, quantity: 1 });
+        cart.products.set(pid, { product, variant: selectedVariant, quantity: 1 });
         const productPrice = product.price;
         cart.totalQuantity = (cart.totalQuantity || 0) + 1;
         cart.totalPrice = (cart.totalPrice || 0) + productPrice;
-        cart.gst = (cart.totalPrice * 0.18);
-        if (cart.totalPrice > 3000) {
-            cart.deliveryCharges = 0;
-        }
-        else {
-            cart.deliveryCharges = 50;
-        }
+        cart.gst = cart.totalPrice * 0.03;
+        cart.deliveryCharges = cart.totalPrice > 3000 ? 0 : 50;
         cart.payablePrice = cart.totalPrice + cart.gst + cart.deliveryCharges;
         yield cart.save();
     }
@@ -103,32 +107,43 @@ const addToCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 
     next();
 }));
 const removeFromCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     if (req.user && req.user._id) {
         req.params.userId = req.user._id.toString();
     }
     const pid = req.body.pid; // Assuming pid is sent in the request body
+    const selectedVariant = req.body.variant; // Assuming variant info is also passed
     const user = req.params.userId;
+    // Find the cart for the current user
     const cart = yield CartModel.findOne({ user });
     if (!cart) {
         return next(new AppError('Cart not found', 404));
     }
     // Check if the product is in the cart
     if (cart.products && cart.products.has(pid)) {
+        const cartProduct = cart.products.get(pid);
+        if (!cartProduct) {
+            return next(new AppError('Product not found in cart', 404));
+        }
+        // Check if the variant exists for the product in the cart
+        if (cartProduct.variant.color !== selectedVariant.color) {
+            return next(new AppError('Product variant not found in cart', 404));
+        }
         // Remove the product from the cart
         const product = yield Product.findOne({ pid });
-        const productquantity = ((_a = cart.products.get(pid)) === null || _a === void 0 ? void 0 : _a.quantity) || 1;
-        const productPrice = (product === null || product === void 0 ? void 0 : product.price) || 0;
+        if (!product) {
+            return next(new AppError('Product not found', 404));
+        }
+        // Calculate quantity and price to adjust the cart
+        const productQuantity = cartProduct.quantity || 1;
+        const productPrice = product.price || 0;
+        // Remove the product from the cart
         cart.products.delete(pid);
-        cart.totalQuantity = cart.totalQuantity - productquantity;
-        cart.totalPrice = cart.totalPrice - productPrice * productquantity;
-        cart.gst = (cart.totalPrice * 0.18);
-        if (cart.totalPrice > 3000) {
-            cart.deliveryCharges = 0;
-        }
-        else {
-            cart.deliveryCharges = 50;
-        }
+        // Update cart totals
+        cart.totalQuantity = cart.totalQuantity - productQuantity;
+        cart.totalPrice = cart.totalPrice - productPrice * productQuantity;
+        // Recalculate GST and delivery charges
+        cart.gst = cart.totalPrice * 0.03;
+        cart.deliveryCharges = cart.totalPrice > 3000 ? 0 : 50;
         cart.payablePrice = cart.totalPrice + cart.gst + cart.deliveryCharges;
         // Save the updated cart
         yield cart.save();
@@ -163,7 +178,7 @@ const updateCartQuantity = catchAsync((req, res, next) => __awaiter(void 0, void
                 // Update totalQuantity and totalPrice
                 cart.totalQuantity += quantityDifference;
                 cart.totalPrice += productPrice * quantityDifference;
-                cart.gst = (cart.totalPrice * 0.18);
+                cart.gst = (cart.totalPrice * 0.03);
                 if (cart.totalPrice > 3000) {
                     cart.deliveryCharges = 0;
                 }

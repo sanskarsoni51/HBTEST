@@ -59,17 +59,23 @@ const deleteUserById = catchAsync(async (req: Request, res: Response, next: Next
 });
 
 const getAllUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const features = new APIFeatures(userModel.find(), req.query);
+  const features = new APIFeatures(userModel.find().select('-_id -createdAt -password'), req.query);
   features.filter().sort().limitFields().paginate();
   const result = await features.query;
+  const limit = req.query.limit || 1;
+  const totalUsers = await userModel.countDocuments(features.query.getFilter());
+
+  // Calculate total pages based on total number of products and specified limit
+  const totalPages = Math.ceil(totalUsers / Number(limit));
   res.status(200).json({
     message: "success",
+    totalPages,
+    totalUsers,
     data: result,
   });
 });
 
 const getMe = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.user);
   if (req.user && (req.user as any)._id) {
     req.params.userId = (req.user as any)._id.toString();
     next();
@@ -78,7 +84,6 @@ const getMe = (req: Request, res: Response, next: NextFunction) => {
 
 const updateProfilePhoto = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const userId = new ObjectId(req.params.userId);
-  // console.log(req.file);
   // Check if files were uploaded
   if (!req.file) {
     return res.status(400).json({ message: 'No images uploaded' });

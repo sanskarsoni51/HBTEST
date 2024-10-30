@@ -43,10 +43,12 @@ const multerStorage = multerS3({
         const fileNameWithoutExt = origName.substring(0, origName.lastIndexOf('.'));
         // Check if it's for profile photo or product image and assign the appropriate path
         let folderPath = '';
+        console.log(req.url);
+        console.log("filenma", file);
         if (req.url.includes('/profile/img') || file.fieldname === 'profilePhoto') {
             folderPath = 'uploads/profile_images/';
         }
-        else if (req.url.includes('/product') || file.fieldname === 'images') {
+        else if (req.url.includes('/product') || file.fieldname === 'images' || file.fieldname === 'newImages') {
             folderPath = 'uploads/product_images/';
         }
         else {
@@ -71,6 +73,11 @@ export const uploadProductImages = multer({
     fileFilter: multerFilter,
     limits: { fileSize: 1024 * 1024 * 5 }, // Limit file size to 5MB
 }).fields([{ name: 'images' }]);
+export const uploadProductNewImages = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter,
+    limits: { fileSize: 1024 * 1024 * 5 }, // Limit file size to 5MB
+}).fields([{ name: 'newImages' }]);
 // Multer configuration for user profile photos
 export const uploadUserProfilePhoto = multer({
     storage: multerStorage,

@@ -8,8 +8,12 @@ const handleCastErrorDB = (err: any) => {
 };
 
 const handleDuplicateFieldsDB = (err: any) => {
-  const value = err.keyValue.name;
-  const message = `Duplicate Field Value: ${value}, please use another value`;
+  // Check if keyValue is available and try to extract the field that caused the error
+  const field = err.keyValue ? Object.keys(err.keyValue)[0] : 'unknown field';
+  const value = err.keyValue ? err.keyValue[field] : 'unknown value';
+  
+  // Construct a proper message
+  const message = `Duplicate Field Value: ${value} for field ${field}, please use another value.`;
   return new AppError(message, 400);
 };
 

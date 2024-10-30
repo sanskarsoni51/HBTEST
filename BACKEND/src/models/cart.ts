@@ -1,5 +1,5 @@
 import mongoose, { Document, ObjectId, Schema } from 'mongoose';
-import { productSchema, Product } from '../models/Product.js';
+import { productSchema, Product, Variant } from '../models/Product.js';
 
 // Define a schema for the cart item
 // interface CartItem {
@@ -9,7 +9,7 @@ import { productSchema, Product } from '../models/Product.js';
 
 // Define a schema for the cart
 interface CartDocument extends Document {
-  products: Map<number, { product: Product; quantity: number }>; 
+  products: Map<number, { product: Product; variant:Variant; quantity: number }>; 
   deliveryCharges: number; // Delivery charges
   gst: number; // Goods and Services Tax (GST)
   totalQuantity: number; // Total quantity of all items in the cart
@@ -24,6 +24,7 @@ const cartSchema = new Schema<CartDocument>({
     type: Map,
     of: {
       product: { type: productSchema }, // Reference to the product
+      variant:{type:Object},
       quantity: { type: Number, default: 1 }, // Default quantity is 1
     }
   },
@@ -38,4 +39,4 @@ const cartSchema = new Schema<CartDocument>({
 // Create your cart model
 const CartModel = mongoose.model<CartDocument>('Cart', cartSchema);
 
-export { CartModel, CartDocument };
+export { CartModel,cartSchema, CartDocument };

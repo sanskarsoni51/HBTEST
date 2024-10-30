@@ -6,6 +6,7 @@ const cartSchema = new Schema({
         type: Map,
         of: {
             product: { type: productSchema }, // Reference to the product
+            variant: { type: Object },
             quantity: { type: Number, default: 1 }, // Default quantity is 1
         }
     },
@@ -18,4 +19,4 @@ const cartSchema = new Schema({
 });
 // Create your cart model
 const CartModel = mongoose.model('Cart', cartSchema);
-export { CartModel };
+export { CartModel, cartSchema };

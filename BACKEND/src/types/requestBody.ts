@@ -1,4 +1,5 @@
 import {Address} from "../models/Address.js"
+import { Variant } from "../models/Product.js";
 
 
 export interface NewUserRequestBody{
@@ -7,13 +8,14 @@ export interface NewUserRequestBody{
     password:string
 }
 
-export interface NewProductRequestBody{
-productName: string;
-  qtyavailable: number;
-  price: number;
-  category: Array<string>;
-  description?: string;
-  colors?: Array<string>;
+export interface NewProductRequestBody {
+  productName: string;          
+  price: number;                 
+  category: string;              
+  subCategory?: string;           
+  description?: string;          
+  variants: string;       
+  status: 'active' | 'deactive' | 'draft';
 }
 
 // export interface NewOrderResponseBody{

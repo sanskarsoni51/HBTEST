@@ -36,7 +36,7 @@ export const login = CatchAsync((req, res, next) => __awaiter(void 0, void 0, vo
     if (!user || !(yield bcrypt.compare(password, user.password))) {
         return next(new AppError('Invalid email or password', 401));
     }
-    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '24h' });
     const cookieOptions = {
         expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
         // SameSite: 'none', // Specify one of the valid SameSite values as a string
@@ -52,7 +52,7 @@ export const logout = (req, res) => {
         expires: new Date(Date.now() + 30),
         httpOnly: true,
     });
-    res.status(200).json({ status: 'success' });
+    res.status(200).json({ message: 'success' });
 };
 // Protect routes by checking if a user is logged in and then assigns them to `req.user`
 export const protect = CatchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

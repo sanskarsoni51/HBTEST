@@ -11,34 +11,65 @@ import mongoose, { Schema } from 'mongoose';
 import CategoryModel from './category.js';
 export const productSchema = new Schema({
     pid: { type: Number, required: true, unique: true },
-    productName: { type: String, required: true, unique: true },
+    productName: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
-    category: { type: [String], ref: 'Category', required: true, validate: {
-            validator: function (categories) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    // Check if all categories in the array exist in the 'Category' collection
-                    console.log(categories);
-                    const categoryCount = yield CategoryModel.countDocuments({ name: { $in: categories } });
-                    console.log(categoryCount);
-                    return categoryCount === categories.length; // Return true if all categories exist, false otherwise
-                });
-            },
-            message: 'One or more categories do not exist' // Error message if validation fails
-        } },
+    category: { type: String, required: true }, // Define without validation first
+    subCategory: { type: String },
     images: { type: [String], default: [] },
-    colors: { type: [String], default: [] },
-    addedAt: { type: Date, default: Date.now },
+    variants: [{
+            color: { type: String, required: true },
+            stock: { type: Number, required: true }
+        }],
+    status: { type: String, enum: ['active', 'deactive', 'draft'], default: 'active' },
+    totalSales: { type: Number, default: 0 },
     qtyavailable: { type: Number, required: true },
+    addedAt: { type: Date, default: Date.now },
+    modifiedAt: { type: Date, default: Date.now },
 }, {
     strict: 'throw'
 });
-// Auto-increment plugin
-// // Create a custom model method for auto-incrementing pid
-// productSchema.statics.getNextPid = async function(): Promise<number> {
-//   const lastDocument: Product | null = await this.findOne({}, {}, { sort: { 'pid': -1 } });
-//   const lastPid: number = lastDocument ? lastDocument.pid : 0;
-//   return lastPid + 1;
-// };
+// Add validation logic separately
+// productSchema.path('category').validate({
+//   validator: async function (categoryName: string) {
+//     const category = await CategoryModel.findOne({ name: categoryName });
+//     return !!category;
+//   },
+//   message: 'Category does not exist'
+// });
+// productSchema.path('subCategory').validate({
+//   validator: async function (subCategoryName: string) {
+//     console.log(`Validating subCategory: ${subCategoryName} under category: ${this.category}`);
+//     const category = await CategoryModel.findOne({ name: this.category});
+//     console.log(category);
+//     return category && category.subCategory.includes(subCategoryName);
+//     // return !!category;
+//   },
+//   message: 'Subcategory does not exist under the provided category'
+// });
+productSchema.pre('validate', function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (this.category) {
+            // Validate category
+            const category = yield CategoryModel.findOne({ name: this.category });
+            if (!category) {
+                return next(new Error('Category does not exist'));
+            }
+        }
+        if (this.subCategory) {
+            // Validate subCategory
+            const category = yield CategoryModel.findOne({ name: this.category });
+            if (category && category.subCategory) {
+                if (!category.subCategory.includes(this.subCategory)) {
+                    return next(new Error('Subcategory does not exist under the provided category'));
+                }
+            }
+            else {
+                return next(new Error('Category does not exist for the given subcategory'));
+            }
+        }
+        next();
+    });
+});
 const ProductModel = mongoose.model('Product', productSchema);
 export default ProductModel;

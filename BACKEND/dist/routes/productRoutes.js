@@ -1,13 +1,13 @@
 import express from "express";
 import ProductRepository from "../Repository/ProductRepository.js";
-import { uploadProductImages } from "../Repository/multer.js";
+import { uploadProductImages, uploadProductNewImages } from "../Repository/multer.js";
 const router = express.Router();
 router.get('/', ProductRepository.getAllProducts);
 router.get('/search', ProductRepository.searchProducts);
 router.get('/newProducts', ProductRepository.getNewProducts);
 router.get('/:productId', ProductRepository.getProductById);
 router.post('/', uploadProductImages, ProductRepository.createProduct);
-router.patch('/:productId', ProductRepository.updateProductById);
+router.patch('/:productId', uploadProductNewImages, ProductRepository.updateProductById);
 router.patch('/:productId/img', uploadProductImages, ProductRepository.updateProductImagesById);
 router.delete('/:productId', ProductRepository.deleteProductById);
 export default router;

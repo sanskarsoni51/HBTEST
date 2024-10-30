@@ -9,9 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import categoryModel from '../models/category.js';
 import catchAsync from '../utels/CatchAsync.js';
+import AppError from '../utels/AppError.js';
 const createCategory = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name } = req.body;
-    const newCategory = yield categoryModel.create({ name });
+    const { name, subCategory } = req.body;
+    const newCategory = yield categoryModel.create({ name, subCategory });
     res.status(201).json({
         message: 'success',
         category: newCategory,
@@ -24,9 +25,36 @@ const getAllCategories = catchAsync((req, res, next) => __awaiter(void 0, void 0
         categories,
     });
 }));
+const deleteCategoryById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const result = yield categoryModel.findByIdAndDelete(id);
+    if (!result) {
+        return next(new AppError('category not found', 404));
+    }
+    res.status(204).json({
+        message: "category deleted successfully",
+    });
+}));
+const updateCategoryById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const categoryId = req.params.categoryId;
+    // console.log(req.body);
+    const result = yield categoryModel.findByIdAndUpdate(categoryId, req.body, {
+        new: true,
+        runValidators: true,
+    });
+    if (!result) {
+        return next(new AppError('category not found', 404));
+    }
+    res.status(200).json({
+        message: "success",
+        data: result,
+    });
+}));
 // Other category controller functions like updateCategory, deleteCategory, etc.
 export default {
     createCategory,
     getAllCategories,
+    deleteCategoryById,
+    updateCategoryById
     // Add other category controller functions here
 };

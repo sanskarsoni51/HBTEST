@@ -23,26 +23,44 @@ const getProductById = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
     });
 }));
 const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { productName, description, category, price, qtyavailable, colors } = req.body;
+    const { productName, description, category, subCategory, price, status } = req.body;
+    console.log("sb pura", productName, description, category, subCategory, price, status);
     // const nextPid: number = await productModel.getNextPid();
     const lastDocument = yield productModel.findOne({}, {}, { sort: { 'pid': -1 } });
     const lastPid = lastDocument ? lastDocument.pid : 0;
+    let images;
     // Check if files were uploaded
     if (!req.files || !('images' in req.files)) {
-        return res.status(400).json({ message: 'No images uploaded' });
+        images = [{ location: "https://haatbazaar-data.s3.ap-south-1.amazonaws.com/uploads/product_images/u_IMG_2712-1729278695387.jpeg" }];
     }
-    // Get the uploaded images
-    const images = req.files["images"];
+    else {
+        // Get the uploaded images
+        images = req.files["images"];
+        console.log("images", images);
+    }
+    // Parse variants from stringified JSON
+    let variants;
+    try {
+        variants = JSON.parse(req.body.variants); // Assuming variants are received as a JSON string
+    }
+    catch (error) {
+        return res.status(400).json({ message: 'Invalid variants format' });
+    }
     // If you're expecting multiple images, you can store their paths in an array
-    const imagePaths = images.map((image) => image.path);
+    const imagePaths = images.map((image) => image.location);
+    let qty = 0;
+    variants.map((s) => qty = qty + s.stock);
+    console.log(qty);
     const createdProduct = yield productModel.create({
         pid: lastPid + 1,
         productName,
         description,
         category,
+        subCategory,
         price,
-        qtyavailable,
-        colors,
+        qtyavailable: qty,
+        variants,
+        status,
         images: imagePaths,
     });
     res.status(201).json({
@@ -52,14 +70,61 @@ const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, v
 }));
 const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.productId;
-    // console.log(req.body);
-    const updatedProduct = yield productModel.findByIdAndUpdate(productId, req.body, {
+    const { productName, description, category, subCategory, price, status } = req.body;
+    let images;
+    // Check if files were uploaded
+    if (!req.files || !('newImages' in req.files)) {
+        images = [{}];
+    }
+    else {
+        // Get the uploaded images
+        images = req.files["newImages"];
+    }
+    // Parse variants from stringified JSON
+    let variants;
+    try {
+        variants = JSON.parse(req.body.variants); // Assuming variants are received as a JSON string
+    }
+    catch (error) {
+        return res.status(400).json({ message: 'Invalid variants format' });
+    }
+    const allImagePaths = [];
+    // Ensure req.body.images is an array
+    if (req.body.images) {
+        // Add existing images to the allImagePaths array
+        console.log("ok");
+        const h = JSON.parse(req.body.images);
+        console.log(h);
+        h.forEach((e) => {
+            allImagePaths.push(e);
+        });
+        // allImagePaths.push(...req.body.images);
+    }
+    // If you're expecting multiple images, you can store their paths in an array
+    const imagePaths = images.map((image) => image.location);
+    let qty = 0;
+    variants.map((s) => qty = qty + s.stock);
+    console.log(qty);
+    allImagePaths.push(...imagePaths);
+    console.log("newpath", allImagePaths);
+    const updatedProduct = yield productModel.findOneAndUpdate({ pid: productId }, {
+        productName,
+        description,
+        category,
+        subCategory,
+        price,
+        qtyavailable: qty,
+        variants,
+        status,
+        images: allImagePaths,
+    }, {
         new: true,
         runValidators: true,
     });
     if (!updatedProduct) {
         return next(new AppError('Product not found', 404));
     }
+    console.log(updatedProduct);
     res.status(200).json({
         message: "success",
         data: updatedProduct,
@@ -74,13 +139,9 @@ const updateProductImagesById = catchAsync((req, res, next) => __awaiter(void 0,
     }
     // Get the uploaded images
     const images = req.files["images"];
-    // console.log(images);
     // Get the paths of the uploaded images
     const imagePaths = images.map((image) => { return image.location || ''; });
-    // const imagePaths = images.map((image: Express.Multer.File) => image.location);
-    // console.log(imagePaths);
-    // Update the product with the given productId to replace its images
-    const updatedProduct = yield productModel.findByIdAndUpdate(productId, { $push: { images: { $each: imagePaths } } }, {
+    const updatedProduct = yield productModel.findOneAndUpdate({ pid: productId }, { $push: { images: { $each: imagePaths } } }, {
         new: true,
         runValidators: true,
     });
@@ -96,7 +157,7 @@ const updateProductImagesById = catchAsync((req, res, next) => __awaiter(void 0,
 }));
 const deleteProductById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.productId;
-    const result = yield productModel.findByIdAndDelete(productId);
+    const result = yield productModel.findOneAndDelete({ pid: productId });
     if (!result) {
         return next(new AppError('Product not found', 404));
     }
@@ -120,6 +181,7 @@ const getAllProducts = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
     res.status(200).json({
         message: "success",
         totalPages,
+        totalProducts,
         data: result,
     });
 }));
