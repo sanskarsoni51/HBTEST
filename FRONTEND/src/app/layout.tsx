@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Noto_Serif, Poppins } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/redux/redux-povide";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/home/Navbar";
 import Foter from "@/components/home/Foter";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Poppins({ subsets: ["latin"], weight: ["500"] });
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,11 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className + "bg-pale"}>
         <ReduxProvider>
           <Navbar />
-          
-            {children}
+
+          {children}
 
           <Foter />
           <Toaster />

@@ -1,26 +1,69 @@
 "use client";
-import AddAddressForm from "@/components/util/AddAddress";
-import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAppSelector } from "@/redux/store";
+import { useAppSelector, useAppDispatch } from "@/redux/store";
 import { useCreateOrderMutation } from "@/redux/api/userApi";
 import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 import { redirect } from "next/navigation";
+import AddAddressForm, { AddAddressInput } from "@/components/util/AddAddress";
+import { addAddress } from "@/redux/slice/orderSlice";
+import { Address } from "@/schema/schema";
 
 const OrderPage = () => {
+  const router = useRouter();
   const cart = useAppSelector((state) => state.cart);
+  const order = useAppSelector((state) => state.order);
+  const { user } = useAppSelector((state) => state.auth);
+
+  const dispatch = useAppDispatch();
+  const [isAddressFormVisible, setAddressFormVisible] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null); // State to manage selected address
+
   const [createOrder, { isSuccess, isLoading, isError }] =
     useCreateOrderMutation();
-  const order = useAppSelector((state) => state.order);
+
+  const handleAddressSubmit = (data: AddAddressInput) => {
+    dispatch(addAddress(data));
+    toast({
+      title: "Address added successfully.",
+      variant: "default",
+      duration: 2500,
+    });
+    setAddressFormVisible(false); // Hide form after successful address submission
+  };
+
+  const handlePlaceOrder = () => {
+    if (!paymentMethod) {
+      toast({
+        title: "Please select a payment method.",
+        variant: "destructive",
+        duration: 2500,
+      });
+      return;
+    }
+
+    if (!selectedAddress) {
+      toast({
+        title: "Please select a shipping address.",
+        variant: "destructive",
+        duration: 2500,
+      });
+      return;
+    }
+
+    const orderData = {
+      ...order,
+      shippingAddress: {
+        ...selectedAddress,
+        pinCode: selectedAddress.pinCode.toString(), // Convert pinCode to string
+      },
+      paymentMethod,
+    };
+
+    createOrder(orderData);
+  };
 
   if (isSuccess) {
     toast({
@@ -30,6 +73,7 @@ const OrderPage = () => {
     });
     redirect("/");
   }
+
   if (isError) {
     toast({
       title: "Order Not Placed.",
@@ -39,114 +83,117 @@ const OrderPage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl text-gray-800 mb-4">Order Summary</h1>
-      <div className="bg-white p-8 rounded-lg shadow-md">
-        {/* Product Details */}
-        <div className="mb-4">
-          <h2 className="text-xl text-gray-800 mb-2">Product Details</h2>
-          <table className="w-full table-auto">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">Product</th>
-                <th className="px-4 py-2">Quantity</th>
-                <th className="px-4 py-2">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(cart.products).map(([productId, productData]) => (
-                <tr key={productId}>
-                  <td className="border border-gray-200 px-4 py-2">
-                    {productData.product.productName}
-                  </td>
-                  <td className="border border-gray-200 px-4 py-2">
-                    {productData.quantity}
-                  </td>
-                  <td className="border border-gray-200 px-4 py-2">{`₹${
-                    productData.quantity * productData.product.price
-                  }`}</td>
-                </tr>
-              ))}
-              {/* Add more products here */}
-            </tbody>
-          </table>
-        </div>
-        {/* Total Amount to Pay */}
-        <div className="mb-4">
-          <h2 className="text-xl text-gray-800 mb-2">Total Amount to Pay</h2>
-          <div className="text-2xl text-gray-800">{`₹ ${cart.payablePrice}`}</div>
-        </div>
-        {/* Payment Options */}
-        <div className="mb-4">
-          <h2 className="text-xl text-gray-800 mb-2">Payment Options</h2>
-          <div className="flex items-center">
-            <input
-              id="credit-card"
-              type="radio"
-              name="payment"
-              value="credit-card"
-              className="mr-2"
-            />
-            <label htmlFor="credit-card" className="text-gray-700">
-              Credit Card
-            </label>
-          </div>
-          <div className="flex items-center">
-            <input
-              id="debit-card"
-              type="radio"
-              name="payment"
-              value="debit-card"
-              className="mr-2"
-            />
-            <label htmlFor="debit-card" className="text-gray-700">
-              Debit Card
-            </label>
-          </div>
-          <div className="flex items-center">
-            <input
-              id="paypal"
-              type="radio"
-              name="payment"
-              value="paypal"
-              className="mr-2"
-            />
-            <label htmlFor="paypal" className="text-gray-700">
-              PayPal
-            </label>
+    <div className="flex flex-col md:flex-row md:space-x-4 px-4 py-6 bg-gray-100">
+      <div className="flex-grow">
+        <div className="bg-white p-6 mb-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-2">Account</h2>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="mb-2">Name: {user.name}</p>
+              <p className="mb-4">Email: {user.email}</p>
+            </div>
+            <Button variant="outline" onClick={() => router.push("/profile")}>
+              Manage Account
+            </Button>
           </div>
         </div>
-        {/* Address for Shipment */}
-        <div>{`Address - ${
-          order.shippingAddress !== null
-            ? `${order.shippingAddress.street},${order.shippingAddress.city},${order.shippingAddress.state},${order.shippingAddress.country},${order.shippingAddress.pinCode}`
-            : "Not Provided"
-        }`}</div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">{`${
-              order.shippingAddress !== null ? "Edit Address" : "Add Address"
-            }`}</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add Address</DialogTitle>
-              <DialogDescription>Add Shipping address.</DialogDescription>
-            </DialogHeader>
-            <AddAddressForm />
-          </DialogContent>
-        </Dialog>
 
-        {/* Order Button */}
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        <div className="bg-white p-6 mb-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-2">Shipping Address</h2>
+          {user.address.map((a, index) => (
+            <div key={index} className="flex items-center mb-2">
+              <input
+                type="radio"
+                id={`address-${index}`}
+                name="shippingAddress"
+                checked={selectedAddress === a}
+                onChange={() => setSelectedAddress(a)} // Set the selected address on change
+                className="mr-2"
+              />
+              <label htmlFor={`address-${index}`}>
+                Address: {a.street}, {a.city}, {a.state}, {a.country},{" "}
+                {a.pinCode}
+              </label>
+            </div>
+          ))}
+
+          <Button
+            variant="outline"
+            onClick={() => setAddressFormVisible(!isAddressFormVisible)}
+          >
+            {user.address.length > 0
+              ? "Edit Shipping Address"
+              : "Add Shipping Address"}
+          </Button>
+
+          {isAddressFormVisible && (
+            <div className="mt-4">
+              <AddAddressForm onSubmit={handleAddressSubmit} />
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white p-6 mb-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-2">Payment Information</h2>
+          <div className="flex items-center mb-2">
+            <input
+              type="radio"
+              id="cod"
+              name="payment"
+              value="COD"
+              checked={paymentMethod === "COD"}
+              onChange={() => setPaymentMethod("COD")}
+              className="mr-2"
+            />
+            <label htmlFor="cod">Cash on Delivery</label>
+          </div>
+          <div className="flex items-center mb-4">
+            <input
+              type="radio"
+              id="razorpay"
+              name="payment"
+              value="Razorpay"
+              checked={paymentMethod === "Razorpay"}
+              onChange={() => setPaymentMethod("Razorpay")}
+              className="mr-2"
+            />
+            <label htmlFor="razorpay">Razorpay</label>
+          </div>
+        </div>
+      </div>
+
+      <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-2">Summary</h2>
+        <div className="mb-2">
+          <p>Product Total: ₹{cart.totalPrice}</p>
+          <p>Total (incl. VAT): ₹{cart.payablePrice}</p>
+        </div>
+        <div className="mb-4">
+          <h3>Order Note</h3>
+          <textarea
+            className="w-full border-gray-300 rounded-md"
+            placeholder="Add a note for the seller"
+          ></textarea>
+        </div>
+        <div className="mb-4">
+          <h3>Applied Voucher</h3>
+          <input
+            type="text"
+            value="HAPPYNEWCLIENT20"
+            readOnly
+            className="border p-2 rounded-md w-full"
+          />
+          <Button variant="outline" className="mt-2">
+            Change
+          </Button>
+        </div>
+        <Button
+          className="w-full bg-blue-500 text-white py-2"
           disabled={isLoading}
-          onClick={(e) => {
-            createOrder(order);
-          }}
+          onClick={handlePlaceOrder}
         >
           Place Order
-        </button>
+        </Button>
       </div>
     </div>
   );

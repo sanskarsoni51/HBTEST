@@ -9,6 +9,17 @@ export interface userSchema {
   address: Address[];
   role: "admin" | "user" | "none";
 }
+export interface CartProductSchema {
+  pid: number;
+  qtyavailable: number;
+  price: number;
+  category: Array<string>;
+  images: Array<string>;
+  productName: string;
+  description?: string;
+  // colors?: Array<string>;
+  variant:Variant[];
+}
 
 export interface ProductSchema {
   pid: number;
@@ -19,10 +30,23 @@ export interface ProductSchema {
   productName: string;
   description?: string;
   colors?: Array<string>;
+  variant:Variant[];
+}
+export interface Variant{
+  color:string;
+  stock:number;
+}
+
+export interface Address {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  pinCode: number;
 }
 
 export interface cartProducts {
-  product: ProductSchema;
+  product: CartProductSchema;
   quantity: number;
 }
 
@@ -35,13 +59,7 @@ export interface CartSchema {
   totalQuantity: number;
   totalPrice: number;
   payablePrice: number;
-}
-export interface Address {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  pinCode: number;
+  address: Address; // Add the address property here
 }
 
 export interface CustomerSchema {

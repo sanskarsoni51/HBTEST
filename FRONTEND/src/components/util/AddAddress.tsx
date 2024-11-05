@@ -1,4 +1,3 @@
-"use client";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { TypeOf, z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -10,29 +9,29 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
-import { toast } from "../ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAppDispatch } from "@/redux/store";
-import { addAddress } from "@/redux/slice/orderSlice";
-// import { useAddAddressMutation } from "@/redux/api/cartApi";
+import { useEffect } from "react";
 
 const addAddressSchema = z.object({
   street: z.string().min(1, "Street is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
   country: z.string().min(1, "Country is required"),
-  pinCode: z.string().min(1, "Pin code is required"), // Assuming pin code is a 6-digit number
+  pinCode: z.string().min(1, "Pin code is required"), // Keeping as string
 });
 
 export type AddAddressInput = TypeOf<typeof addAddressSchema>;
 
-const AddAddressForm = () => {
-  //   const [addAddress, { isLoading, isSuccess, isError, error }] =
-  // useAddAddressMutation();
-  const form = useForm<z.infer<typeof addAddressSchema>>({
+interface AddAddressFormProps {
+  onSubmit: SubmitHandler<AddAddressInput>; // Prop to handle form submission
+  initialValues?: AddAddressInput | null; // Prop to pre-fill form on edit
+}
+
+const AddAddressForm = ({ onSubmit, initialValues }: AddAddressFormProps) => {
+  const form = useForm<AddAddressInput>({
     resolver: zodResolver(addAddressSchema),
-    defaultValues: {
+    defaultValues: initialValues || {
+      // Use initialValues for editing
       street: "",
       city: "",
       state: "",
@@ -47,54 +46,16 @@ const AddAddressForm = () => {
     formState: { isSubmitSuccessful },
   } = form;
 
-  //   useEffect(() => {
-  //     if (isSuccess) {
-  //       toast({
-  //         title: "Add address Successful!",
-  //         variant: "default",
-  //         duration: 2000,
-  //       });
-  //     }
-
-  //     if (isError) {
-  //       if (error) {
-  //         toast({
-  //           title: "Add Address Failed",
-  //           description: `${error}`,
-  //           variant: "destructive",
-  //           duration: 2000,
-  //         });
-  //       } else {
-  //         toast({
-  //           title: "Network Error. Please try again.",
-  //           variant: "destructive",
-  //           duration: 2000,
-  //         });
-  //       }
-  //     }
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [isLoading]);
-
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset();
+      reset(); // Reset form on successful submission
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitSuccessful]);
-
-  const dispatch = useAppDispatch();
-
-  const SubmitAddress: SubmitHandler<TypeOf<typeof addAddressSchema>> = (
-    data,
-  ) => {
-    // Call the addAddress mutation with the form data
-    dispatch(addAddress(data));
-  };
+  }, [isSubmitSuccessful, reset]);
 
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmit(SubmitAddress)}
+        onSubmit={handleSubmit(onSubmit)} // Handle submission
         className="text-brown text-xl font-semibold"
       >
         <FormItem>

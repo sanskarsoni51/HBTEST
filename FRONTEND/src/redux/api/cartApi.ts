@@ -3,6 +3,7 @@ import { userApi } from "./userApi";
 import { toast } from "@/components/ui/use-toast";
 import { REHYDRATE } from "redux-persist";
 import { setCart } from "../slice/cartSlice";
+import { Variant } from "@/schema/schema";
 
 export const cartApi = createApi({
   reducerPath: "cartapi",
@@ -11,15 +12,15 @@ export const cartApi = createApi({
     credentials: "include",
   }),
   endpoints: (builder) => ({
-    addToCart: builder.mutation<any, number>({
-      query(itemId) {
+    addToCart: builder.mutation<any, {pid:number, variant: Variant}>({
+      query({pid,variant}) {
         return {
           url: `/cart/addToCart`,
           method: "POST",
           headers: {
             authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-          body: { pid: itemId.toString() },
+          body: { pid: pid.toString(),variant },
         };
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
@@ -41,6 +42,7 @@ export const cartApi = createApi({
                   payablePrice: cart.payablePrice,
                   totalPrice: cart.totalPrice,
                   totalQuantity: cart.totalQuantity,
+                  address:cart.shippingAddress
                 }),
               );
             }

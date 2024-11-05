@@ -11,7 +11,7 @@ interface CardProps {
 function Card1({ product }: CardProps) {
   return (
     <div
-      className="w-[180px] sm:w-[200px] aspect-[2/3] flex flex-col items-center bg-contain my-2 overflow-hidden rounded-lg shadow-md hover:shadow-xl text-center"
+      className="w-[200px] sm:w-[220px] aspect-[2/3] flex flex-col items-center bg-contain my-2 overflow-hidden rounded-lg shadow-md hover:shadow-xl text-center"
       style={{ backgroundImage: `url("/card1bg.jpg")` }}
     >
       <Link href={`/product/${product?.pid}`}>

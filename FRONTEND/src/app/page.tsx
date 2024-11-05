@@ -5,7 +5,7 @@ import Sevices from "@/components/home/Sevices";
 
 export default function Home() {
   return (
-    <main>
+    <main className="bg-pale">
       <MainCourousel />
       <Bestseller />
       <Sevices />

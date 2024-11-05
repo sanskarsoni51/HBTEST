@@ -1,13 +1,13 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
-const config = {
+const config: Config = {
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     container: {
@@ -19,10 +19,10 @@ const config = {
     },
     extend: {
       colors: {
-          brown: '#532200',
-          lbrown: '#914110',
-          gold: '#E1A140',
-          pale:'#EFCFA0',
+        brown: '#532200',
+        lbrown: '#914110',
+        gold: '#E1A140',
+        pale: '#EFCFA0',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -62,6 +62,11 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'], // Custom sans-serif font
+        serif: ['Merriweather', 'serif'], // Custom serif font
+        custom: ['YourCustomFont', 'sans-serif'], // Add any other custom font
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -79,6 +84,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config
+};
 
-export default config
+export default config;

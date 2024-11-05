@@ -27,7 +27,7 @@ const AddtoCartButton = ({ productToAdd }: Props) => {
     return (
       <Button
         onClick={() => {
-          AddToCart(productToAdd.pid);
+          // AddToCart(productToAdd.pid);
           if (isSuccess) {
             toast({
               title: "Successfully Added to Cart",
