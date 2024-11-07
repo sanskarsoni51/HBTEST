@@ -14,11 +14,12 @@ export interface CartProductSchema {
   qtyavailable: number;
   price: number;
   category: Array<string>;
+  subCategory: string;
   images: Array<string>;
   productName: string;
   description?: string;
   // colors?: Array<string>;
-  variant:Variant[];
+  variant: Variant[];
 }
 
 export interface ProductSchema {
@@ -30,11 +31,10 @@ export interface ProductSchema {
   productName: string;
   description?: string;
   colors?: Array<string>;
-  variant:Variant[];
+  variants: Variant[];
 }
-export interface Variant{
-  color:string;
-  stock:number;
+export interface Variant {
+  color: string;
 }
 
 export interface Address {
@@ -48,6 +48,7 @@ export interface Address {
 export interface cartProducts {
   product: CartProductSchema;
   quantity: number;
+  variant: { color: string };
 }
 
 export interface CartSchema {

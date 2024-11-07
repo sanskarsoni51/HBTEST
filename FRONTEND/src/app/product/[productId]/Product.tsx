@@ -1,15 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { StarFilledIcon } from "@radix-ui/react-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCorousel from "./productCorousel";
-import { ProductSchema } from "@/schema/schema";
+import { ProductSchema, Variant } from "@/schema/schema";
 import AddtoCartButton from "./AddtoCartButton";
 import { toast } from "@/components/ui/use-toast";
 
 const Product = ({ product }: { product: ProductSchema }) => {
   // Tab state to switch between sections
   const [activeTab, setActiveTab] = useState("details");
-
+  const [variant, setVariant] = useState<Variant>({ color: "" });
+  useEffect(() => {
+    console.log("Product", variant);
+  }, [variant]);
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-5 lg:p-10">
       {/* Product Image Section */}
@@ -51,24 +54,30 @@ const Product = ({ product }: { product: ProductSchema }) => {
         <div className="mb-4">
           <span className="font-semibold">Available Color:</span>
           <div className="flex gap-2 mt-2">
-            {product.variant &&
-              product.variant.color &&
-              JSON.parse(product.variant.color[0]).map(
-                (color: string, index: number) => (
-                  <label key={index}>
-                    <input
-                      type="radio"
-                      name="color"
-                      value={color}
-                      className="hidden"
-                    />
-                    <span
-                      className="inline-block w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:border-gray-400"
-                      style={{ backgroundColor: color }}
-                    ></span>
-                  </label>
-                )
-              )}
+            {product.variants &&
+              product.variants.map(({ color }, index) => (
+                <label key={index}>
+                  <input
+                    type="radio"
+                    name="color"
+                    value={color}
+                    className="hidden"
+                    onChange={(e) => {
+                      setVariant({ color: e.target.value });
+                    }}
+                  />
+                  <span
+                    className={`inline-block w-6 h-6 rounded-full cursor-pointer border-2 hover:border-gray-400 ${
+                      variant.color === color
+                        ? "border-black"
+                        : "border-transparent"
+                    } `}
+                    style={{ backgroundColor: color }}
+                  >
+                    {/* {variant.color === color ? "slected" : ""} */}
+                  </span>
+                </label>
+              ))}
           </div>
         </div>
 
@@ -97,7 +106,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
           >
             Add to Favorite
           </Button>
-          <AddtoCartButton productToAdd={product} />
+          <AddtoCartButton productToAdd={product} variant={variant} />
         </div>
       </div>
 
@@ -193,7 +202,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
         >
           Add to Favorite
         </Button>
-        <AddtoCartButton productToAdd={product} />
+        <AddtoCartButton productToAdd={product} variant={variant} />
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { userApi } from "./userApi";
 import { toast } from "@/components/ui/use-toast";
 import { REHYDRATE } from "redux-persist";
 import { setCart } from "../slice/cartSlice";
-import { Variant } from "@/schema/schema";
+import { CartSchema, Variant } from "@/schema/schema";
 
 export const cartApi = createApi({
   reducerPath: "cartapi",
@@ -12,15 +12,15 @@ export const cartApi = createApi({
     credentials: "include",
   }),
   endpoints: (builder) => ({
-    addToCart: builder.mutation<any, {pid:number, variant: Variant}>({
-      query({pid,variant}) {
+    addToCart: builder.mutation<any, { pid: number; variant: Variant }>({
+      query({ pid, variant }) {
         return {
           url: `/cart/addToCart`,
           method: "POST",
           headers: {
             authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-          body: { pid: pid.toString(),variant },
+          body: { pid: pid.toString(), variant: variant },
         };
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
@@ -32,20 +32,21 @@ export const cartApi = createApi({
               duration: 1000,
             });
           } else {
-            const cart = (await queryFulfilled).data.data;
-            if (cart) {
-              dispatch(
-                setCart({
-                  products: cart.products,
-                  deliveryCharges: cart.deliveryCharges,
-                  gst: cart.gst,
-                  payablePrice: cart.payablePrice,
-                  totalPrice: cart.totalPrice,
-                  totalQuantity: cart.totalQuantity,
-                  address:cart.shippingAddress
-                }),
-              );
-            }
+            dispatch(setCart((await queryFulfilled).data.data as CartSchema));
+            // const cart = (await queryFulfilled).data.data;
+            // if (cart) {
+            //   dispatch(
+            //     setCart({
+            //       products: cart.products,
+            //       deliveryCharges: cart.deliveryCharges,
+            //       gst: cart.gst,
+            //       payablePrice: cart.payablePrice,
+            //       totalPrice: cart.totalPrice,
+            //       totalQuantity: cart.totalQuantity,
+            //       address:cart.shippingAddress
+            //     }),
+            //   );
+            // }
           }
         } catch (error) {
           toast({
@@ -56,30 +57,31 @@ export const cartApi = createApi({
         }
       },
     }),
-    removeFromCart: builder.mutation<any, number>({
-      query(itemId) {
+    removeFromCart: builder.mutation<any, { pid: number; variant: Variant }>({
+      query(item) {
         return {
           url: `/cart/removeFromCart`,
           method: "POST",
           headers: {
             authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-          body: { pid: itemId.toString() },
+          body: { pid: item.pid.toString(), variant: item.variant },
         };
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          const cart = (await queryFulfilled).data.data;
-          dispatch(
-            setCart({
-              products: cart.products,
-              deliveryCharges: cart.deliveryCharges,
-              gst: cart.gst,
-              payablePrice: cart.payablePrice,
-              totalPrice: cart.totalPrice,
-              totalQuantity: cart.totalQuantity,
-            }),
-          );
+          dispatch(setCart((await queryFulfilled).data.data as CartSchema));
+          // const cart = (await queryFulfilled).data.data;
+          // dispatch(
+          //   setCart({
+          //     products: cart.products,
+          //     deliveryCharges: cart.deliveryCharges,
+          //     gst: cart.gst,
+          //     payablePrice: cart.payablePrice,
+          //     totalPrice: cart.totalPrice,
+          //     totalQuantity: cart.totalQuantity,
+          //   }),
+          // );
         } catch (error) {
           toast({
             title: "Error",
@@ -91,9 +93,9 @@ export const cartApi = createApi({
     }),
     manipulateQuantity: builder.mutation<
       any,
-      { itemId: number; quantity: number }
+      { itemId: number; quantity: number; variant: Variant }
     >({
-      query({ itemId, quantity }) {
+      query({ itemId, quantity, variant }) {
         // quantity is updated quantity.
         return {
           url: `/cart/changeQuantity`,
@@ -101,22 +103,27 @@ export const cartApi = createApi({
           headers: {
             authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
-          body: { pid: itemId.toString(), quantity: quantity.toString() },
+          body: {
+            pid: itemId.toString(),
+            quantity: quantity.toString(),
+            variant: variant,
+          },
         };
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          const cart = (await queryFulfilled).data.data;
-          dispatch(
-            setCart({
-              products: cart.products,
-              deliveryCharges: cart.deliveryCharges,
-              gst: cart.gst,
-              payablePrice: cart.payablePrice,
-              totalPrice: cart.totalPrice,
-              totalQuantity: cart.totalQuantity,
-            }),
-          );
+          dispatch(setCart((await queryFulfilled).data.data as CartSchema));
+          // const cart = (await queryFulfilled).data.data;
+          // dispatch(
+          //   setCart({
+          //     products: cart.products,
+          //     deliveryCharges: cart.deliveryCharges,
+          //     gst: cart.gst,
+          //     payablePrice: cart.payablePrice,
+          //     totalPrice: cart.totalPrice,
+          //     totalQuantity: cart.totalQuantity,
+          //   }),
+          // );
         } catch (error) {
           toast({
             title: "Error",

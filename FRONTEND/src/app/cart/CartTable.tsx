@@ -65,12 +65,17 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
                   <div className="flex-grow mx-4">
                     {/* Product Info */}
                     <p className="text-lg font-semibold">
-                      {productData.product.productName}
+                      {`${productData.product.productName}(${productData.variant.color})`}
                     </p>
                     <Button
                       type="button"
                       className="bg-brown rounded hover:bg-red-600 transition duration-200 mt-8"
-                      onClick={() => removeqty(productData.product.pid)}
+                      onClick={() =>
+                        removeqty({
+                          pid: productData.product.pid,
+                          variant: productData.variant,
+                        })
+                      }
                     >
                       REMOVE
                     </Button>
@@ -86,9 +91,13 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
                             changeqty({
                               itemId: productData.product.pid,
                               quantity: productData.quantity - 1,
+                              variant: productData.variant,
                             });
                           } else {
-                            removeqty(productData.product.pid);
+                            removeqty({
+                              pid: productData.product.pid,
+                              variant: productData.variant,
+                            });
                           }
                         }}
                       >
@@ -108,6 +117,7 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
                           changeqty({
                             itemId: productData.product.pid,
                             quantity: productData.quantity + 1,
+                            variant: productData.variant,
                           });
                         }}
                       >

@@ -16,6 +16,7 @@ const Cart = () => {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
     setCart(cartfromredux);
+    console.log(cart);
   }, [cart, cartfromredux]);
 
   // Check if cart is empty based on total quantity

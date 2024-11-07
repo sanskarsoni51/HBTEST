@@ -73,6 +73,7 @@ const Shop = () => {
           colors: product.colors,
           pid: product.pid,
           price: product.price,
+          variants: product.variants,
         };
         temproducts.push(newProduct);
       });
