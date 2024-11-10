@@ -94,7 +94,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
         {/* Add to Cart and Favorite Buttons */}
         <div className="flex flex-col gap-3 lg:flex-row">
-          <Button
+          {/* <Button
             onClick={() => {
               toast({
                 title: "Feature will be available soon.",
@@ -105,7 +105,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
             variant="outline"
           >
             Add to Favorite
-          </Button>
+          </Button> */}
           <AddtoCartButton productToAdd={product} variant={variant} />
         </div>
       </div>
@@ -190,7 +190,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
       {/* Sticky Bottom Section for Mobile */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex flex-col gap-3">
-        <Button
+        {/* <Button
           onClick={() => {
             toast({
               title: "Feature will be available soon.",
@@ -201,7 +201,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
           variant="outline"
         >
           Add to Favorite
-        </Button>
+        </Button> */}
         <AddtoCartButton productToAdd={product} variant={variant} />
       </div>
     </div>
