@@ -15,11 +15,17 @@ function Card1({ product }: CardProps) {
       style={{ backgroundImage: `url("/card1bg.jpg")` }}
     >
       <Link href={`/product/${product?.pid}`}>
-        <img
-          src="/cat2.jpg"
-          alt={product?.productName}
-          className="mt-6 rounded-md w-[120px] aspect-[3/4] md:w-[140px] object-cover items-center"
-        />
+        {product.images && product.images.length > 0 ? (
+          <img
+            src={product.images[0]}
+            alt={product.productName}
+            className="mt-6 rounded-md w-[120px] aspect-[3/4] md:w-[140px] object-cover"
+          />
+        ) : (
+          <div className="mt-6 rounded-md w-[120px] aspect-[3/4] md:w-[140px] flex items-center justify-center text-gray-500">
+            No Image Available
+          </div>
+        )}
       </Link>
       <Link href={`/product/${product?.pid}`}>
         <span className="font-semibold text-sm text-wrap line-clamp-1 max-w-[150px]">
