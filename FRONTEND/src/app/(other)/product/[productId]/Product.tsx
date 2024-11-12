@@ -38,44 +38,33 @@ const Product = ({ product }: { product: ProductSchema }) => {
           &#8377; {product.price} /-
         </div>
 
-        {/* Size Selection */}
-        {/* <div className="mb-4">
-          <span className="font-semibold">Available Size:</span>
-          <div className="flex gap-2 mt-2">
-            {["S", "M", "L"].map((size) => (
-              <Button key={size} variant="outline">
-                {size}
-              </Button>
-            ))}
-          </div>
-        </div> */}
-
         {/* Color Selection */}
         <div className="mb-4">
           <span className="font-semibold">Available Color:</span>
           <div className="flex gap-2 mt-2">
             {product.variants &&
               product.variants.map(({ color }, index) => (
-                <label key={index}>
+                <label key={index} className="cursor-pointer">
                   <input
                     type="radio"
                     name="color"
                     value={color}
                     className="hidden"
                     onChange={(e) => {
-                      setVariant({ color: e.target.value });
+                      setVariant((prev) => ({
+                        ...prev,
+                        color: e.target.value,
+                      }));
                     }}
                   />
                   <span
-                    className={`inline-block w-6 h-6 rounded-full cursor-pointer border-2 hover:border-gray-400 ${
+                    className={`inline-block w-6 h-6 rounded-full border-2 ${
                       variant.color === color
                         ? "border-black"
                         : "border-transparent"
-                    } `}
+                    } hover:border-gray-400`}
                     style={{ backgroundColor: color }}
-                  >
-                    {/* {variant.color === color ? "slected" : ""} */}
-                  </span>
+                  ></span>
                 </label>
               ))}
           </div>
@@ -94,7 +83,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
         {/* Add to Cart and Favorite Buttons */}
         <div className="flex flex-col gap-3 lg:flex-row">
-          {/* <Button
+          <Button
             onClick={() => {
               toast({
                 title: "Feature will be available soon.",
@@ -105,7 +94,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
             variant="outline"
           >
             Add to Favorite
-          </Button> */}
+          </Button>
           <AddtoCartButton productToAdd={product} variant={variant} />
         </div>
       </div>
@@ -190,7 +179,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
       {/* Sticky Bottom Section for Mobile */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex flex-col gap-3">
-        {/* <Button
+        <Button
           onClick={() => {
             toast({
               title: "Feature will be available soon.",
@@ -201,7 +190,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
           variant="outline"
         >
           Add to Favorite
-        </Button> */}
+        </Button>
         <AddtoCartButton productToAdd={product} variant={variant} />
       </div>
     </div>

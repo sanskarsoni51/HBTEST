@@ -4,11 +4,14 @@ import CartTable from "./CartTable";
 import CartCard from "./CartCard";
 import { CartSchema } from "@/schema/schema";
 import { useAppSelector } from "@/redux/store";
+import { useGetCartQuery } from "@/redux/api/userApi";
 
 const Cart = () => {
   const updateCart = (updatedCart: CartSchema) => {
     setCart(updatedCart);
   };
+
+  const { data, isSuccess, isLoading, isError } = useGetCartQuery(null);
 
   const cartfromredux = useAppSelector((state) => state.cart);
   const [cart, setCart] = useState<CartSchema>(cartfromredux);
@@ -16,8 +19,11 @@ const Cart = () => {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
     setCart(cartfromredux);
+    if (isSuccess) {
+      console.log("Success");
+    }
     console.log(cart);
-  }, [cart, cartfromredux]);
+  }, [cart, cartfromredux, data]);
 
   // Check if cart is empty based on total quantity
   const isCartEmpty = cart.totalQuantity === 0;

@@ -52,7 +52,9 @@ const CartCard = ({ cart }: props) => {
 
           <div className="w-full flex flex-row my-4 border-y-2 text-xl border-lbrown">
             <span className="w-full text-left font-bold">{`Total`}</span>
-            <span className="w-full text-right">{cart.payablePrice}</span>
+            <span className="w-full text-right">
+              {cart.payablePrice.toFixed(2)}
+            </span>
           </div>
 
           <hr className="my-4" />

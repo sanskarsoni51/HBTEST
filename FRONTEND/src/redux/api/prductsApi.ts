@@ -30,7 +30,7 @@ export const productApi = createApi({
       { category: string; sort: string; pageNumber: number; search?: string }
     >({
       query: ({ category, sort, pageNumber, search }) => {
-        let filterString = `/product?limit=${12}&page=${pageNumber}`;
+        let filterString = `/product?limit=${8}&page=${pageNumber}`;
         if (category !== "") {
           filterString += `&category=${category}`;
         }

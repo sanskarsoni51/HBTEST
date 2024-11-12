@@ -1,6 +1,7 @@
 import { Address, CartSchema } from "@/schema/schema";
 import React, { useState, useEffect } from "react";
 import SelectedOrderDetails from "./SelectedOrderDetails";
+import { Button } from "@/components/ui/button";
 
 // Define the type for an individual order item
 type OrderItem = {
@@ -15,7 +16,6 @@ const Orders = ({ order }: { order: Array<OrderItem> }) => {
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(
     order[0] || null
   );
-
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
   const ordersPerPage = 4; // Set number of orders to display per page
 
@@ -25,7 +25,10 @@ const Orders = ({ order }: { order: Array<OrderItem> }) => {
   // Get the current orders to display
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = order.slice(indexOfFirstOrder, indexOfLastOrder);
+  const currentOrders = order
+    .slice()
+    .reverse()
+    .slice(indexOfFirstOrder, indexOfLastOrder);
 
   const handleOrderClick = (orderDetails: OrderItem) => {
     setSelectedOrder(orderDetails);
@@ -43,7 +46,7 @@ const Orders = ({ order }: { order: Array<OrderItem> }) => {
   }, [order]);
 
   return (
-    <div className="w-full max-h-screen overflow-y-auto bg-gray-100 p-4 flex flex-col md:flex-row">
+    <div className="w-full h-screen overflow-y-auto bg-gray-100 p-4 flex flex-col md:flex-row">
       {/* Orders List */}
       <div className="w-full md:w-3/4 mb-6 md:mb-0">
         <div className="bg-white shadow-lg rounded-lg p-6">
@@ -55,11 +58,17 @@ const Orders = ({ order }: { order: Array<OrderItem> }) => {
               >
                 {/* Product Image */}
                 <div className="flex items-center justify-center">
-                  <img
-                    src="https://haatbazaar-data.s3.ap-south-1.amazonaws.com/uploads/product_images/u_IMG_2712-1729278695387.jpeg"
-                    alt="Product"
-                    className="h-24 w-24 object-cover rounded-md"
-                  />
+                  {/* Displaying the first product's image */}
+                  {o.cart.products &&
+                    Object.values(o.cart.products).length > 0 && (
+                      <img
+                        src={
+                          Object.values(o.cart.products)[0].product.images[0]
+                        } // Use the first product's image URL
+                        alt="Product"
+                        className="h-24 w-24 object-cover rounded-md"
+                      />
+                    )}
                 </div>
 
                 {/* Order Info - Displaying in a row for all screen sizes */}
@@ -84,7 +93,9 @@ const Orders = ({ order }: { order: Array<OrderItem> }) => {
 
                   <div className="text-center md:text-left px-2">
                     <div className="font-semibold text-lg">Price</div>
-                    <div className="text-sm">${o.cart.payablePrice}</div>
+                    <div className="text-sm">
+                      {o.cart.payablePrice.toFixed(2)}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -99,31 +110,85 @@ const Orders = ({ order }: { order: Array<OrderItem> }) => {
           ))}
 
           {/* Pagination Controls */}
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-4 py-2 mr-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
-            >
-              Previous
-            </button>
+          {totalPages > 1 && (
+            <nav className="flex space-x-2 justify-center mb-5">
+              <div className="flex overflow-x-auto no-scrollbar gap-2 px-2">
+                <Button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="text-brown hover:text-white bg-pale px-3 py-1"
+                >
+                  {"<"}
+                </Button>
 
-            <span className="px-4 py-2">
-              Page {currentPage} of {totalPages}
-            </span>
+                <Button
+                  onClick={() => handlePageChange(1)}
+                  className={`text-brown hover:text-white ${
+                    currentPage === 1 ? "bg-lbrown text-white" : "bg-pale"
+                  } px-3 py-1`}
+                >
+                  1
+                </Button>
 
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 ml-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+                {currentPage > 3 && totalPages > 4 && (
+                  <span className="text-gray-500">...</span>
+                )}
+
+                {currentPage > 2 && (
+                  <Button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="text-brown hover:text-white bg-pale px-3 py-1"
+                  >
+                    {currentPage - 1}
+                  </Button>
+                )}
+
+                {currentPage !== 1 && currentPage !== totalPages && (
+                  <Button
+                    className="bg-lbrown text-white px-3 py-1"
+                    onClick={() => handlePageChange(currentPage)}
+                  >
+                    {currentPage}
+                  </Button>
+                )}
+
+                {currentPage < totalPages - 1 && (
+                  <Button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="text-brown hover:text-white bg-pale px-3 py-1"
+                  >
+                    {currentPage + 1}
+                  </Button>
+                )}
+
+                {currentPage < totalPages - 2 && totalPages > 4 && (
+                  <span className="text-gray-500">...</span>
+                )}
+
+                <Button
+                  onClick={() => handlePageChange(totalPages)}
+                  className={`text-brown hover:text-white ${
+                    currentPage === totalPages
+                      ? "bg-lbrown text-white"
+                      : "bg-pale"
+                  } px-3 py-1`}
+                >
+                  {totalPages}
+                </Button>
+
+                <Button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="text-brown hover:text-white bg-pale px-3 py-1"
+                >
+                  {">"}
+                </Button>
+              </div>
+            </nav>
+          )}
         </div>
       </div>
 
-      {/* Selected Order Details - Always visible on larger screens */}
       <div className="hidden md:block w-full md:w-2/4">
         <SelectedOrderDetails selectedOrder={selectedOrder} />
       </div>

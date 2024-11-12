@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/redux/store";
 import { useCreateOrderMutation } from "@/redux/api/userApi";
@@ -15,23 +15,40 @@ const OrderPage = () => {
   const cart = useAppSelector((state) => state.cart);
   const order = useAppSelector((state) => state.order);
   const { user } = useAppSelector((state) => state.auth);
+  const [isEditable, setIsEditable] = useState(false);
+  const [voucherCode, setVoucherCode] = useState("HAPPYNEWCLIENT20");
 
   const dispatch = useAppDispatch();
+  const [addresses, setAddresses] = useState<Address[]>(user.address || []);
   const [isAddressFormVisible, setAddressFormVisible] = useState(false);
+  // const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null); // State to manage selected address
 
   const [createOrder, { isSuccess, isLoading, isError }] =
     useCreateOrderMutation();
 
+  useEffect(() => {
+    // Update the local state when Redux state changes
+    setAddresses(user.address);
+  }, [user.address]);
+
   const handleAddressSubmit = (data: AddAddressInput) => {
-    dispatch(addAddress(data));
+    const newAddress: Address = {
+      ...data,
+      pinCode: parseInt(data.pinCode, 10), // Convert pinCode to number if required
+    };
+
+    dispatch(addAddress(newAddress));
+    setAddresses([...addresses, newAddress]); // Update local state for immediate reactivity
+    setSelectedAddress(newAddress); // Set the newly added address as selected
+
     toast({
-      title: "Address added successfully.",
+      title: "Address added successfully and selected for shipping.",
       variant: "default",
       duration: 2500,
     });
-    setAddressFormVisible(false); // Hide form after successful address submission
+    setAddressFormVisible(false);
   };
 
   const handlePlaceOrder = () => {
@@ -100,14 +117,16 @@ const OrderPage = () => {
 
         <div className="bg-white p-6 mb-4 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-2">Shipping Address</h2>
-          {user.address.map((a, index) => (
+
+          {/* Display all addresses, including the new one */}
+          {addresses.map((a, index) => (
             <div key={index} className="flex items-center mb-2">
               <input
                 type="radio"
                 id={`address-${index}`}
                 name="shippingAddress"
                 checked={selectedAddress === a}
-                onChange={() => setSelectedAddress(a)} // Set the selected address on change
+                onChange={() => setSelectedAddress(a)}
                 className="mr-2"
               />
               <label htmlFor={`address-${index}`}>
@@ -165,13 +184,15 @@ const OrderPage = () => {
       <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-2">Summary</h2>
         <div className="mb-2">
-          <p>Product Total: ₹{cart.totalPrice}</p>
-          <p>Total (incl. VAT): ₹{cart.payablePrice}</p>
+          <p>Product Total: ₹{cart.totalPrice.toFixed(2)}</p>
+          <p>GST: ₹{cart.gst.toFixed(2)}</p>
+          <p>Shipping Charges: ₹{cart.deliveryCharges}</p>
+          <p>Total (incl. VAT): ₹{cart.payablePrice.toFixed(2)}</p>
         </div>
         <div className="mb-4">
           <h3>Order Note</h3>
           <textarea
-            className="w-full border-gray-300 rounded-md"
+            className="w-full border-gray-300 border p-2 rounded-md"
             placeholder="Add a note for the seller"
           ></textarea>
         </div>
@@ -179,12 +200,17 @@ const OrderPage = () => {
           <h3>Applied Voucher</h3>
           <input
             type="text"
-            value="HAPPYNEWCLIENT20"
-            readOnly
+            value={voucherCode}
+            readOnly={!isEditable}
+            onChange={(e) => setVoucherCode(e.target.value)}
             className="border p-2 rounded-md w-full"
           />
-          <Button variant="outline" className="mt-2">
-            Change
+          <Button
+            variant="outline"
+            className="mt-2"
+            onClick={() => setIsEditable((prev) => !prev)}
+          >
+            {isEditable ? "Save" : "Change"}
           </Button>
         </div>
         <Button

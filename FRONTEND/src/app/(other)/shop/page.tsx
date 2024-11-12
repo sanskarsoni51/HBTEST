@@ -25,6 +25,7 @@ const Shop = () => {
   const [page, setPage] = useState<number>(0);
   const [maxpage, setMaxPage] = useState<number>(0);
   const [cat, setCat] = useState<Array<{ name: string }> | null>(null);
+  const [showCategories, setShowCategories] = useState(false); // New state for category visibility
 
   const [getProducts, { isSuccess, isError, isLoading, data, error }] =
     useGetProductsWithFilterMutation();
@@ -92,33 +93,23 @@ const Shop = () => {
     setCategory(event);
   };
 
-  const nextPage = (num: number) => {
-    if (num >= maxpage) {
-      return console.log("You are on the last Page!");
-    } else {
-      setPage(num);
-    }
-  };
-
-  const prevPage = (num: number) => {
-    if (num < 0) {
-      return console.log("You are on the first Page!");
-    } else {
-      setPage(num);
-    }
-  };
-
   if (isError) {
-    return <div>Network Error. Please refresh or try again later!</div>;
+    return (
+      <div className="flex flex-col md:flex-row justify-center h-500">
+        <div className="flex flex-col gap-4 p-5 w-full md:w-1/4">
+          No Product found
+        </div>
+      </div>
+    );
   }
   if (isLoading) {
     return <PageLoader />;
   }
   if (isSuccess) {
     return (
-      <div className="flex flex-col md:flex-row justify-center items-start">
+      <div className="flex flex-col md:flex-row justify-center h-500 items-start">
         {/* Filters on the left */}
-        <div className="flex flex-col gap-4 p-5 md:w-1/4">
+        <div className="flex flex-col gap-4 p-5 w-full md:w-1/4">
           <Input
             placeholder="Search Product"
             className="h-8 text-lg"
@@ -141,32 +132,41 @@ const Shop = () => {
             </SelectContent>
           </Select>
 
-          {/* Show all categories without dropdown */}
-          <h2 className="font-bold">Categories</h2>
-          <div className="flex flex-col gap-2">
-            {cat === null ? (
-              <span>Loading categories...</span>
-            ) : (
-              cat.map((c, i) => (
-                <Button
-                  key={i}
-                  onClick={() => handleCategory(c.name)}
-                  className={`text-left ${
-                    category === c.name
-                      ? "bg-lbrown text-white"
-                      : "bg-white text-black"
-                  }`}
-                >
-                  {c.name}
-                </Button>
-              ))
-            )}
-          </div>
+          {/* Toggle button for showing/hiding categories */}
+          <Button onClick={() => setShowCategories(!showCategories)}>
+            {showCategories ? "Hide Categories" : "Show Categories"}
+          </Button>
+
+          {/* Conditionally render categories based on showCategories state */}
+          {showCategories && (
+            <div>
+              <h2 className="font-bold">Categories</h2>
+              <div className="flex flex-col gap-2">
+                {cat === null ? (
+                  <span>Loading categories...</span>
+                ) : (
+                  cat.map((c, i) => (
+                    <Button
+                      key={i}
+                      onClick={() => handleCategory(c.name)}
+                      className={`text-left ${
+                        category === c.name
+                          ? "bg-lbrown text-white"
+                          : "bg-white text-black"
+                      }`}
+                    >
+                      {c.name}
+                    </Button>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Product display on the right */}
-        <div className="md:w-3/4">
-          <ul className="grid grid-cols-2 lg:grid-cols-4 my-5 gap-20">
+        <div className="w-full md:w-3/4">
+          <ul className="grid grid-cols-2 gap-6 lg:grid-cols-4 my-5 md:gap-8">
             {product &&
               product.map((item, index) => (
                 <li key={index} className="flex item-center justify-center">
@@ -176,48 +176,90 @@ const Shop = () => {
           </ul>
           {maxpage > 1 && (
             <nav className="flex space-x-2 justify-center mb-5">
-              <div className="max-w-sm md:max-w-md overflow-scroll no-scrollbar gap-3 flex flex-row">
-                {/* Show the first page */}
+              <div className="flex overflow-x-auto no-scrollbar gap-2 px-2">
+                {/* Previous Button */}
                 <Button
-                  onClick={() => setPage(0)}
-                  className={`text-brown hover:text-white ${
-                    page === 0 ? "bg-lbrown text-white" : "bg-pale"
-                  }`}
+                  onClick={() => setPage(page > 0 ? page - 1 : 0)}
+                  disabled={page === 0}
+                  className="text-brown hover:text-white bg-pale px-3 py-1"
                 >
                   {"<"}
                 </Button>
 
-                {page > 3 && <span className="text-gray-500">...</span>}
+                {/* First Page Button */}
+                <Button
+                  onClick={() => setPage(0)}
+                  className={`text-brown hover:text-white ${
+                    page === 0 ? "bg-lbrown text-white" : "bg-pale"
+                  } px-3 py-1`}
+                >
+                  1
+                </Button>
 
-                {/* Show pages around the current page */}
-                {Array.from({ length: maxpage }, (x, i) => (x = i))
-                  .filter((n) => n >= page - 2 && n <= page + 2)
-                  .map((n) => (
-                    <Button
-                      key={n}
-                      onClick={() => setPage(n)}
-                      className={`text-brown hover:text-white ${
-                        page === n ? "bg-lbrown text-white" : "bg-pale"
-                      }`}
-                    >
-                      {n + 1}
-                    </Button>
-                  ))}
-
-                {page < maxpage - 3 && (
+                {/* Ellipsis if there’s a gap after the first page */}
+                {page > 2 && maxpage > 4 && (
                   <span className="text-gray-500">...</span>
                 )}
 
-                {maxpage > 1 && (
+                {/* Previous Page Button */}
+                {page > 1 && page < maxpage && (
                   <Button
-                    onClick={() => setPage(maxpage - 1)}
+                    onClick={() => setPage(page - 1)}
                     className={`text-brown hover:text-white ${
-                      page === maxpage - 1 ? "bg-lbrown text-white" : "bg-pale"
-                    }`}
+                      page === page - 1 ? "bg-lbrown text-white" : "bg-pale"
+                    } px-3 py-1`}
                   >
-                    {">"}
+                    {page}
                   </Button>
                 )}
+
+                {/* Current Page Button */}
+                {page > 0 && page < maxpage - 1 && (
+                  <Button
+                    onClick={() => setPage(page)}
+                    className="bg-lbrown text-white px-3 py-1"
+                  >
+                    {page + 1}
+                  </Button>
+                )}
+
+                {/* Next Page Button */}
+                {page < maxpage - 2 && (
+                  <Button
+                    onClick={() => setPage(page + 1)}
+                    className={`text-brown hover:text-white ${
+                      page === page + 1 ? "bg-lbrown text-white" : "bg-pale"
+                    } px-3 py-1`}
+                  >
+                    {page + 2}
+                  </Button>
+                )}
+
+                {/* Ellipsis if there’s a gap before the last page */}
+                {page < maxpage - 3 && maxpage > 4 && (
+                  <span className="text-gray-500">...</span>
+                )}
+
+                {/* Last Page Button */}
+                <Button
+                  onClick={() => setPage(maxpage - 1)}
+                  className={`text-brown hover:text-white ${
+                    page === maxpage - 1 ? "bg-lbrown text-white" : "bg-pale"
+                  } px-3 py-1`}
+                >
+                  {maxpage}
+                </Button>
+
+                {/* Next Button */}
+                <Button
+                  onClick={() =>
+                    setPage(page < maxpage - 1 ? page + 1 : maxpage - 1)
+                  }
+                  disabled={page === maxpage - 1}
+                  className="text-brown hover:text-white bg-pale px-3 py-1"
+                >
+                  {">"}
+                </Button>
               </div>
             </nav>
           )}

@@ -18,7 +18,7 @@ const Navbar = () => {
         </Link>
         <DesktopMenu />
         <div className="flex justify-center gap-3 items-center text-gold ">
-          <Link href="/shop">
+          <Link href="/contactus">
             <MagnifyingGlassIcon className="h-[28px] w-[30px]  cursor-pointer"></MagnifyingGlassIcon>
           </Link>
           <Link href="/cart">
