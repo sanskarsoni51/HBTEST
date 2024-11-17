@@ -90,8 +90,8 @@ export const userApi = createApi({
         };
       },
     }),
-    updateProfile: builder.mutation<any, { name?: string; password?: string }>({
-      query: (profile: { name?: string; password?: string }) => {
+    updateProfile: builder.mutation<any, { name?: string; password?: string; address?: object }>({
+      query: (profile: { name?: string; password?: string; address?: object }) => {
         return {
           url: "/user/profile",
           method: "PATCH",
@@ -107,7 +107,7 @@ export const userApi = createApi({
           await dispatch(userApi.endpoints.getUser.initiate(null));
         } catch (error: any) {
           throw new Error(
-            error.message ? error.message : "Error occured updating user info."
+            error.message ? error.message : "Error occurred updating user info."
           );
         }
       },
