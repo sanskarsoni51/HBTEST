@@ -4,6 +4,8 @@ export interface userSchema {
   email: string;
   password: string;
   profilePhoto: string;
+  // createdAt: Date;
+  // blocked: boolean;
   address: Address[];
   role: "admin" | "user" | "none";
 }

@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { useLazyUserImageupdateQuery } from "@/redux/api/userApi";
-import React from "react";
+import Image from "next/image";
+import React, { useEffect } from "react";
 
 const ProfilePhotoUpdate = ({ picsrc }: { picsrc: string }) => {
   const [imgSrc, setImgSrc] = React.useState<File | null>(null);
@@ -31,31 +32,34 @@ const ProfilePhotoUpdate = ({ picsrc }: { picsrc: string }) => {
       });
     }
   }
-
   return (
     <div className="flex flex-row gap-4 items-center">
-      {picsrc ? (
-        <img
-          src={picsrc}
-          alt="Profile Photo"
-          className="rounded-full w-[100px] h-[100px] object-cover aspect-square"
-        />
-      ) : (
-        <div className="rounded-full w-[100px] h-[100px] flex items-center justify-center bg-gray-200 text-gray-500">
-          No Image
-        </div>
-      )}
+      <Image
+        src="/cat2.jpg"
+        width={100}
+        height={100}
+        alt="profilePhoto"
+        className="rounded-full aspect-square"
+        priority
+      />
       <div className="flex flex-col gap-2">
         <Input
           placeholder="New Profile"
           type="file"
           onChange={(e) => {
             if (e.target.files?.length) {
-              setImgSrc(e.target.files[0]);
+              if (e.target.files.length > 0) {
+                setImgSrc(e.target.files[0]);
+              }
             }
           }}
         />
-        <Button onClick={changepic} disabled={isLoading || !imgSrc}>
+        <Button
+          onClick={() => {
+            changepic();
+          }}
+          disabled={isLoading || !imgSrc}
+        >
           Change
         </Button>
       </div>
