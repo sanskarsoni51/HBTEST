@@ -101,7 +101,7 @@ const Foter = () => {
               Products
             </h6>
             <p className="mb-4">
-              <a href="#!" className="text-pale ">
+              <a href="/shop" className="text-pale ">
                 Imitation
               </a>
             </p>
@@ -127,17 +127,17 @@ const Foter = () => {
               Useful links
             </h6>
             <p className="mb-4">
-              <a href="#!" className="text-pale ">
+              <a href="/product" className="text-pale ">
                 Pricing
               </a>
             </p>
             <p className="mb-4">
-              <a href="#!" className="text-pale">
+              <a href="/profile" className="text-pale">
                 Settings
               </a>
             </p>
             <p className="mb-4">
-              <a href="#!" className="text-pale ">
+              <a href="/orders" className="text-pale ">
                 Orders
               </a>
             </p>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Serif, Poppins } from "next/font/google";
-import "./globals.css";
+
 import ReduxProvider from "@/redux/redux-povide";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/home/Navbar";
@@ -21,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className + "bg-pale"}>
-        <ReduxProvider>{children}</ReduxProvider>
+        <Navbar />
+        {children}
+        <Foter />
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { setAuthState, setAuthUser } from "../slice/authSlice";
 import { setCart } from "../slice/cartSlice";
 import { toast } from "@/components/ui/use-toast";
 import { CreateOrderSchema } from "./orderApi";
+import { CartSchema } from "@/schema/schema";
 
 export const userApi = createApi({
   reducerPath: "userapi",
@@ -34,7 +35,7 @@ export const userApi = createApi({
                 address: user.address,
                 profilePhoto: user.profilePhoto,
                 role: user.role,
-              }),
+              })
             );
           }
           await queryFulfilled;
@@ -56,17 +57,19 @@ export const userApi = createApi({
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          const cart = (await queryFulfilled).data.data;
-          dispatch(
-            setCart({
-              products: cart.products,
-              deliveryCharges: cart.deliveryCharges,
-              gst: cart.gst,
-              payablePrice: cart.payablePrice,
-              totalPrice: cart.totalPrice,
-              totalQuantity: cart.totalQuantity,
-            }),
-          );
+          // const cart = (await queryFulfilled).data.data;
+          dispatch(setCart((await queryFulfilled).data.data as CartSchema));
+          // console.log("data from api", cart);
+          // dispatch(
+          //   setCart({
+          //     products: cart.products,
+          //     deliveryCharges: cart.deliveryCharges,
+          //     gst: cart.gst,
+          //     payablePrice: cart.payablePrice,
+          //     totalPrice: cart.totalPrice,
+          //     totalQuantity: cart.totalQuantity,
+          //   }),
+          // );
         } catch (error) {
           toast({
             title: "Error",
@@ -104,7 +107,7 @@ export const userApi = createApi({
           await dispatch(userApi.endpoints.getUser.initiate(null));
         } catch (error: any) {
           throw new Error(
-            error.message ? error.message : "Error occured updating user info.",
+            error.message ? error.message : "Error occured updating user info."
           );
         }
       },
@@ -156,7 +159,7 @@ export const userApi = createApi({
               address: user.address,
               profilePhoto: user.profilePhoto,
               role: user.role,
-            }),
+            })
           );
         } catch (error) {
           console.log(error);

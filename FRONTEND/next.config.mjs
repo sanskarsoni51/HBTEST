@@ -3,9 +3,10 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: `${process.env.NEXT_PUBLIC_API_URL}`,
-        port: "5000",
+        protocol: "https",
+        // hostname: `${process.env.NEXT_PUBLIC_API_URL}`,
+        hostname: 'haatbazaar-data.s3.ap-south-1.amazonaws.com',
+        // port: "5000",
       },
     ],
   },

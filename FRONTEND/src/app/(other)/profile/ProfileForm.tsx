@@ -99,7 +99,7 @@ const ProfileForm = ({ user }: { user: userSchema }) => {
 
   const onSubmit: SubmitHandler<RegisterInput> = (values) => {
     const arr = Object.entries(values).filter(
-      ([key, values]) => values !== "" && key != "email",
+      ([key, values]) => values !== "" && key != "email"
     );
     const obj = Object.fromEntries(arr);
     updateUser(obj);
@@ -158,6 +158,25 @@ const ProfileForm = ({ user }: { user: userSchema }) => {
                   <Input
                     {...field}
                     placeholder="You don't talk about it."
+                    required={false}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="passwordConfirm"
+            render={({ field }) => (
+              <FormItem className="my-3">
+                <FormLabel className="flex flex-row font-semibold">
+                  Confirm Parrsword:
+                  <FormMessage className="ml-3 font-medium" />
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Can we have it again. Please?"
                     required={false}
                   />
                 </FormControl>

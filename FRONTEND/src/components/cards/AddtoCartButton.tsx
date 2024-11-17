@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { addToCart } from "@/redux/slice/cartSlice";
 import { ProductSchema } from "@/schema/schema";
@@ -23,6 +23,9 @@ const AddtoCartButton = ({ productToAdd }: Props) => {
       duration: 2000,
     });
   }
+  useEffect(() => {
+    console.log(`${productToAdd.pid}: ${productToAdd.variants}`);
+  });
 
   if (inCart.products && inCart.products[productToAdd.pid]) {
     return (
@@ -39,7 +42,19 @@ const AddtoCartButton = ({ productToAdd }: Props) => {
     return (
       <Button
         onClick={() => {
-          AddToCart(productToAdd.pid);
+          AddToCart({
+            pid: productToAdd.pid,
+            variant: {
+              color: productToAdd.variants
+                ? productToAdd.variants[0].color
+                : "no color",
+            },
+          });
+          if (isSuccess) {
+            toast({
+              title: "Successfully Added to Cart",
+            });
+          }
         }}
         className="w-[120px] text-brown bg-pale h-[30px]"
       >
