@@ -97,7 +97,7 @@ const deleteOrderById = catchAsync((req, res, next) => __awaiter(void 0, void 0,
 const getAllOrders = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     // const orders = await Order.find().populate('userId').populate('shippingAddress');
     const features = new APIFeatures(Order.find().populate('userId').populate('shippingAddress'), req.query);
-    features.filter().sort().limitFields().paginate();
+    features.filter().sort('orderId').limitFields().paginate();
     const result = yield features.query;
     const limit = req.query.limit || 1;
     const totalOrders = yield Order.countDocuments(features.query.getFilter());

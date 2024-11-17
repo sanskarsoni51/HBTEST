@@ -19,7 +19,7 @@ export const signup = CatchAsync((req, res, next) => __awaiter(void 0, void 0, v
     const hashedPassword = yield bcrypt.hash(password, 10);
     const user = yield userModel.create({ name, email, password: hashedPassword });
     yield CartModel.create({ user: user._id });
-    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '24h' });
     const cookieOptions = {
         expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
         // SameSite: 'none', // Specify one of the valid SameSite values as a string

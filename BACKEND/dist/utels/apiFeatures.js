@@ -18,14 +18,14 @@ class APIFeatures {
         this.query = query;
         return this;
     }
-    sort() {
+    sort(defaultField = 'createdAt') {
         //2) sorting
         if (this.queryString.sort) {
             const sortBy = this.queryString.sort.split(',').join(' ');
             this.query = this.query.sort(sortBy);
         }
         else {
-            this.query = this.query.sort('addedAt');
+            this.query = this.query.sort(`${defaultField} _id`);
         }
         return this;
     }

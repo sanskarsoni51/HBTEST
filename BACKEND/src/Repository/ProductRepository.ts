@@ -179,7 +179,7 @@ const deleteProductById = catchAsync(async (req: Request, res: Response, next: N
 
 const getAllProducts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const features = new APIFeatures(productModel.find(), req.query);
-  features.filter().sort().limitFields().paginate();
+  features.filter().sort('pid').limitFields().paginate();
   // console.log(req.query);
   const result = await features.query;
   const limit = req.query.limit || 1;
