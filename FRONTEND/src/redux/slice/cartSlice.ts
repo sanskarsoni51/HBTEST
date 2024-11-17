@@ -1,4 +1,9 @@
-import { CartSchema, ProductSchema, cartProducts } from "@/schema/schema";
+import {
+  CartProductSchema,
+  CartSchema,
+  ProductSchema,
+  cartProducts,
+} from "@/schema/schema";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   cartApi,
@@ -9,6 +14,7 @@ import { toast } from "@/components/ui/use-toast";
 
 const initialState: CartSchema = {
   products: {},
+  address: { city: "", country: "", pinCode: 0, state: "", street: "" },
   deliveryCharges: 0,
   gst: 0,
   totalQuantity: 0,
@@ -23,8 +29,14 @@ const cartSlice = createSlice({
   name: "Cart",
   initialState,
   reducers: {
-    addToCart(state, action: PayloadAction<ProductSchema>) {
-      const productId = action.payload.pid;
+    addToCart(
+      state,
+      action: PayloadAction<{
+        prduct: CartProductSchema;
+        variant: { color: string };
+      }>
+    ) {
+      const productId = action.payload.prduct.pid;
       if (productId in state.products) {
         // If the product is already present then increment its quantity by one.
         state.totalQuantity++;
@@ -32,7 +44,11 @@ const cartSlice = createSlice({
         state.products[productId]["quantity"]++;
       } else {
         // Otherwise, Add new Product to the list with a default quantity of one.
-        let newProduct: cartProducts = { product: action.payload, quantity: 1 };
+        let newProduct: cartProducts = {
+          product: action.payload.prduct,
+          quantity: 1,
+          variant: action.payload.variant,
+        };
 
         state.products[productId] = newProduct;
         state.totalQuantity++;
@@ -90,7 +106,7 @@ const cartSlice = createSlice({
       }
       state.totalPrice = Object.values(state.products).reduce(
         (acc, item) => acc + item.product.price * item.quantity,
-        0,
+        0
       );
     },
     setCart(state, action: PayloadAction<CartSchema>) {
@@ -106,5 +122,4 @@ const cartSlice = createSlice({
 
 export default cartSlice.reducer;
 // Action creators
-export const { addToCart, updateQtyInCart, setCart } =
-  cartSlice.actions;
+export const { addToCart, updateQtyInCart, setCart } = cartSlice.actions;
