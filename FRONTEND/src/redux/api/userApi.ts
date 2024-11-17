@@ -90,8 +90,8 @@ export const userApi = createApi({
         };
       },
     }),
-    updateProfile: builder.mutation<any, { name?: string; password?: string }>({
-      query: (profile: { name?: string; password?: string }) => {
+    updateProfile: builder.mutation<any, { name?: string; password?: string; address?: object }>({
+      query: (profile: { name?: string; password?: string; address?: object }) => {
         return {
           url: "/user/profile",
           method: "PATCH",
