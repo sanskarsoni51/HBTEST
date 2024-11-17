@@ -22,6 +22,7 @@
 }
 
 @layer base {
+  html {  font: system-ui !important; }
   :root {
     scrollbar-color: brown gold;
     scrollbar-width: thin;

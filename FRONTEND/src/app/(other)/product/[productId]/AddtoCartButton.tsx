@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ProductSchema } from "@/schema/schema";
+import { ProductSchema, Variant } from "@/schema/schema";
 import { useAppSelector } from "@/redux/store";
 import { useAddToCartMutation } from "@/redux/api/cartApi";
 import { redirect } from "next/navigation";
@@ -9,8 +9,9 @@ import { toast } from "@/components/ui/use-toast";
 
 interface Props {
   productToAdd: ProductSchema;
+  variant: Variant;
 }
-const AddtoCartButton = ({ productToAdd }: Props) => {
+const AddtoCartButton = ({ productToAdd, variant }: Props) => {
   const [AddToCart, { isSuccess, isError, error }] = useAddToCartMutation();
   const inCart = useAppSelector((state) => state.cart);
   if (inCart.products[productToAdd.pid]) {
@@ -27,7 +28,7 @@ const AddtoCartButton = ({ productToAdd }: Props) => {
     return (
       <Button
         onClick={() => {
-          AddToCart(productToAdd.pid);
+          AddToCart({ pid: productToAdd.pid, variant: variant });
           if (isSuccess) {
             toast({
               title: "Successfully Added to Cart",

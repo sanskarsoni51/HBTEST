@@ -28,6 +28,7 @@ const Bestseller = () => {
           colors: p.colors,
           pid: p.pid,
           price: p.price,
+          variants: p.variants,
         };
         product.push(newProduct);
       });
