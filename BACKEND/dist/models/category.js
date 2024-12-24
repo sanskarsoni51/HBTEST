@@ -1,7 +1,7 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 const categorySchema = new Schema({
     name: { type: String, required: true, unique: true },
-    subCategory: { type: [String] }
+    subCategory: { type: [String] },
 });
-const CategoryModel = mongoose.model('Category', categorySchema);
+const CategoryModel = mongoose.model("Category", categorySchema);
 export default CategoryModel;

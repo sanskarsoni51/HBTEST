@@ -15,9 +15,11 @@ import ProductModel from "../models/Product.js";
 import APIFeatures from "../utels/apiFeatures.js";
 const getOrderById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const orderId = req.params.orderId;
-    const result = yield Order.findOne({ orderId: orderId }).populate('userId').populate('shippingAddress');
+    const result = yield Order.findOne({ orderId: orderId })
+        .populate("userId")
+        .populate("shippingAddress");
     if (!result) {
-        return next(new AppError('Order not found', 404));
+        return next(new AppError("Order not found", 404));
     }
     res.status(200).json({
         message: "success",
@@ -30,14 +32,14 @@ const getOrdersOfUser = catchAsync((req, res, next) => __awaiter(void 0, void 0,
     }
     const user = req.params.userId;
     // Find orders by user ID
-    const orders = yield Order.find({ userId: user }).populate('shippingAddress');
+    const orders = yield Order.find({ userId: user }).populate("shippingAddress");
     // If no orders found for the user, return a 404 error
     if (!orders || orders.length === 0) {
-        return next(new AppError('Orders not found for the user', 404));
+        return next(new AppError("Orders not found for the user", 404));
     }
     // Send success response with the orders
     res.status(200).json({
-        message: 'success',
+        message: "success",
         data: orders,
     });
 }));
@@ -48,14 +50,22 @@ const createOrder = catchAsync((req, res, next) => __awaiter(void 0, void 0, voi
     const user = req.params.userId;
     const cart = yield CartModel.findOne({ user });
     // console.log(user,cart);
-    const lastDocument = yield Order.findOne({}, {}, { sort: { 'orderId': -1 } });
-    const lastOrderId = lastDocument ? lastDocument.orderId : 'THB0000'; // Default if no last order exists
+    const lastDocument = yield Order.findOne({}, {}, { sort: { orderId: -1 } });
+    const lastOrderId = lastDocument ? lastDocument.orderId : "THB0000"; // Default if no last order exists
     const numericPart = lastOrderId.slice(3);
-    const newNumericPart = (parseInt(numericPart) + 1).toString().padStart(4, '0'); // Increment and pad with zeros
+    const newNumericPart = (parseInt(numericPart) + 1).toString().padStart(4, "0"); // Increment and pad with zeros
     const newOrderId = `THB${newNumericPart}`;
-    const { paymentId, status, shippingAddress } = req.body;
+    const { paymentId, paymentSignature, status, shippingAddress } = req.body;
     console.log(paymentId, status, shippingAddress);
-    const createdOrder = yield Order.create({ orderId: newOrderId, userId: user, cart, paymentId, status, shippingAddress });
+    const createdOrder = yield Order.create({
+        orderId: newOrderId,
+        userId: user,
+        cart,
+        paymentId,
+        paymentSignature,
+        status,
+        shippingAddress,
+    });
     yield updateProductStockAndSales(cart === null || cart === void 0 ? void 0 : cart.products);
     yield CartModel.findByIdAndUpdate(cart === null || cart === void 0 ? void 0 : cart._id, {
         products: {}, // Empty the Map of products
@@ -77,7 +87,7 @@ const updateOrderById = catchAsync((req, res, next) => __awaiter(void 0, void 0,
         runValidators: true,
     });
     if (!result) {
-        return next(new AppError('Order not found', 404));
+        return next(new AppError("Order not found", 404));
     }
     res.status(200).json({
         message: "success",
@@ -88,7 +98,7 @@ const deleteOrderById = catchAsync((req, res, next) => __awaiter(void 0, void 0,
     const orderId = req.params.orderId;
     const result = yield Order.findOneAndDelete({ orderId: orderId });
     if (!result) {
-        return next(new AppError('Order not found', 404));
+        return next(new AppError("Order not found", 404));
     }
     res.status(204).json({
         message: "Order deleted successfully",
@@ -96,8 +106,8 @@ const deleteOrderById = catchAsync((req, res, next) => __awaiter(void 0, void 0,
 }));
 const getAllOrders = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     // const orders = await Order.find().populate('userId').populate('shippingAddress');
-    const features = new APIFeatures(Order.find().populate('userId').populate('shippingAddress'), req.query);
-    features.filter().sort('orderId').limitFields().paginate();
+    const features = new APIFeatures(Order.find().populate("userId").populate("shippingAddress"), req.query);
+    features.filter().sort("orderId").limitFields().paginate();
     const result = yield features.query;
     const limit = req.query.limit || 1;
     const totalOrders = yield Order.countDocuments(features.query.getFilter());
@@ -115,20 +125,17 @@ const updateProductStockAndSales = (productsMap) => __awaiter(void 0, void 0, vo
         return;
     for (const [pid, cartProduct] of productsMap) {
         const { product, variant, quantity } = cartProduct;
-        // Find the product by its pid
         const dbProduct = yield ProductModel.findOne({ pid });
         if (!dbProduct) {
             throw new Error(`Product with pid ${pid} not found`);
         }
-        // Find the variant in the product's variants array
-        const productVariant = dbProduct.variants.find(v => v.color === variant.color);
+        const productVariant = dbProduct.variants.find((v) => v.color === variant.color);
         if (!productVariant) {
             throw new Error(`Variant with color ${variant.color} not found in product ${dbProduct.productName}`);
         }
-        // Update stock and total sales
         productVariant.stock -= quantity;
         dbProduct.totalSales = (dbProduct.totalSales || 0) + quantity;
-        // Save the updated product back to the database
+        dbProduct.qtyavailable = (dbProduct.qtyavailable || 0) - quantity;
         yield dbProduct.save();
     }
 });
@@ -138,5 +145,5 @@ export default {
     updateOrderById,
     deleteOrderById,
     getAllOrders,
-    getOrdersOfUser
+    getOrdersOfUser,
 };

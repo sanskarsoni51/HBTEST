@@ -6,6 +6,7 @@ const orderSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'user', required: true },
     cart: cartSchema,
     paymentId: { type: String, required: true },
+    paymentSignature: { type: String, required: true },
     status: { type: String, enum: ['Order Placed', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'pending'], default: 'Order Placed' },
     shippingAddress: { type: addressSchema, required: true },
     createdAt: { type: Date, default: Date.now() } // Default to current date/time

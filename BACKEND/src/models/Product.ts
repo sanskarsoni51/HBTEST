@@ -13,7 +13,7 @@ export interface Product extends Document {
   price: number;
   images: Array<string>;
   category: string;
-  subCategory?:string
+  subCategory?:Array<string>;
   productName: string;
   description?: string;
   variants: Variant[];
@@ -29,7 +29,7 @@ export const productSchema = new Schema<Product>({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   category: { type: String, required: true },  // Define without validation first
-  subCategory: { type: String },
+  subCategory: { type: [String] },
   images: { type: [String] , default : [] },
   variants: [{
       color: { type: String, required: true },
@@ -75,16 +75,27 @@ productSchema.pre('validate', async function (next) {
     }
   }
   
-  if (this.subCategory) {
-    // Validate subCategory
+  if (this.subCategory && Array.isArray(this.subCategory)) {
+    // Validate subCategory array
     const category = await CategoryModel.findOne({ name: this.category });
     if (category && category.subCategory) {
-      if (!category.subCategory.includes(this.subCategory)) {
-        return next(new Error('Subcategory does not exist under the provided category'));
+      // Ensure all provided subcategories exist under the category
+      const invalidSubCategories = this.subCategory.filter(
+        (subCat: string) => !category.subCategory.includes(subCat)
+      );
+
+      if (invalidSubCategories.length > 0) {
+        return next(
+          new Error(
+            `The following subcategories do not exist under the provided category: ${invalidSubCategories.join(', ')}`
+          )
+        );
       }
     } else {
-      return next(new Error('Category does not exist for the given subcategory'));
+      return next(new Error('Category does not exist for the given subcategories'));
     }
+  } else if (this.subCategory) {
+    return next(new Error('SubCategory must be an array of strings'));
   }
   
   next();

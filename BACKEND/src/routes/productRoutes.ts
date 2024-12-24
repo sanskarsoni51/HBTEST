@@ -9,6 +9,7 @@ const router = express.Router();
 router.get('/',ProductRepository.getAllProducts);
 router.get('/search',ProductRepository.searchProducts);
 router.get('/newProducts',ProductRepository.getNewProducts);
+router.get('/bestSellers',ProductRepository.getBestSellers);
 router.get('/:productId',ProductRepository.getProductById);
 router.post('/',uploadProductImages,ProductRepository.createProduct);
 router.patch('/:productId',uploadProductNewImages,ProductRepository.updateProductById);

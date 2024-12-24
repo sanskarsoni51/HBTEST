@@ -39,7 +39,6 @@ export const login = CatchAsync(async (req: Request, res: Response, next: NextFu
   };
   res.cookie('jwt', token,cookieOptions); 
   // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-  // res.cookie('jwt', token, cookieOptions);
   res.status(200).json({ message: 'Login successful', token });
 });
 
@@ -54,15 +53,9 @@ export const logout = (req: Request, res: Response) => {
 
 // Protect routes by checking if a user is logged in and then assigns them to `req.user`
 export const protect = CatchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  // console.log(req.cookies);
   let token;
-  // if (req.cookies && req.cookies.jwt) {
-  //   token = req.cookies.jwt;
-  //   console.log(token);
-  // } else 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
-    // console.log("bearer",token);
   }
   if (!token) {
     return next(new AppError('You are not logged in! Please login.',  401));
@@ -72,7 +65,6 @@ export const protect = CatchAsync(async (req: Request, res: Response, next: Next
     if (typeof token === 'string') {
       decoded = await jwt.verify(token, 'your-secret-key');
     } else {
-      // Token is already decoded
       decoded = token;
     }
 
