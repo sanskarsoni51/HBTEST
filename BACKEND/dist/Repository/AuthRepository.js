@@ -19,7 +19,7 @@ export const signup = CatchAsync((req, res, next) => __awaiter(void 0, void 0, v
     const hashedPassword = yield bcrypt.hash(password, 10);
     const user = yield userModel.create({ name, email, password: hashedPassword });
     yield CartModel.create({ user: user._id });
-    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '24h' });
     const cookieOptions = {
         expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
         // SameSite: 'none', // Specify one of the valid SameSite values as a string
@@ -44,7 +44,6 @@ export const login = CatchAsync((req, res, next) => __awaiter(void 0, void 0, vo
     };
     res.cookie('jwt', token, cookieOptions);
     // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-    // res.cookie('jwt', token, cookieOptions);
     res.status(200).json({ message: 'Login successful', token });
 }));
 export const logout = (req, res) => {
@@ -56,15 +55,9 @@ export const logout = (req, res) => {
 };
 // Protect routes by checking if a user is logged in and then assigns them to `req.user`
 export const protect = CatchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    // console.log(req.cookies);
     let token;
-    // if (req.cookies && req.cookies.jwt) {
-    //   token = req.cookies.jwt;
-    //   console.log(token);
-    // } else 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
-        // console.log("bearer",token);
     }
     if (!token) {
         return next(new AppError('You are not logged in! Please login.', 401));
@@ -75,7 +68,6 @@ export const protect = CatchAsync((req, res, next) => __awaiter(void 0, void 0, 
             decoded = yield jwt.verify(token, 'your-secret-key');
         }
         else {
-            // Token is already decoded
             decoded = token;
         }
         if (typeof decoded !== 'string') {

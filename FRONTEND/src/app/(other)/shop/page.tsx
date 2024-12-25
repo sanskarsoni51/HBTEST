@@ -219,7 +219,7 @@ const Shop = () => {
               <div className="flex overflow-x-auto no-scrollbar gap-2 px-2">
                 {/* Pagination Controls */}
                 <Button
-                  onClick={() => setPage(page > 0 ? page - 1 : 0)}
+                  onClick={() => setPage(page > 0 ? page : 0)}
                   disabled={page === 0}
                   className="text-brown hover:text-white bg-pale px-3 py-1"
                 >

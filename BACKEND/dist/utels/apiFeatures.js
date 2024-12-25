@@ -3,29 +3,71 @@ class APIFeatures {
         this.query = query;
         this.queryString = queryString;
     }
+    // filter() {
+    //     // 1A) FILTERING
+    //     const queryObj: any = { ...this.queryString };
+    //     let filters: string[] = [];
+    //     if(this.queryString.category){
+    //         filters = this.queryString.category?.split(',').map((item: string) => item.trim());
+    //     }
+    //     const excludeFields: string[] = ['page', 'sort', 'limit', 'fields','category']; // Exclude 'category' from excludeFields
+    //     excludeFields.forEach((el: string) => delete queryObj[el]);
+    //     // 1B) ADVANCED FILTERING
+    //     let query: any = this.query.find(queryObj); // Construct query object directly
+    //         console.log(this.queryString.category)
+    //          // Split and trim categories
+    //     if(filters.length > 0){
+    //         query = query.find({
+    //             $or: [
+    //                 { category: { $in: filters } }, // Match categories
+    //                 { subCategory: { $in: filters } } // Match subcategories (use $in)
+    //             ]
+    //         });
+    //     }
+    //     console.log(query);
+    //     this.query = query;
+    //     return this;
+    // }
     filter() {
         // 1A) FILTERING
         const queryObj = Object.assign({}, this.queryString);
-        const excludeFields = ['page', 'sort', 'limit', 'fields']; // Exclude 'category' from excludeFields
+        const excludeFields = ['page', 'sort', 'limit', 'fields', 'category', 'subCategory'];
         excludeFields.forEach((el) => delete queryObj[el]);
-        // 1B) ADVANCED FILTERING
-        let query = this.query.find(queryObj); // Construct query object directly
-        // Modify queryObj to handle category filtering
+        // 1B) ADVANCED FILTERING (for other fields)
+        let query = this.query.find(queryObj);
+        // Check for hierarchical filtering
         if (this.queryString.category) {
-            const categories = this.queryString.category.split(',').map((cat) => cat.trim()); // Split comma-separated categories and remove any leading/trailing whitespace
-            query = query.where('category').all(categories); // Add category filter to the query
+            const categoryFilters = this.queryString.category
+                .split(',')
+                .map((item) => item.trim());
+            // Start with category filtering
+            query = query.find({
+                category: { $in: categoryFilters },
+            });
+            // Apply subcategory filtering only if subCategory is specified
+            if (this.queryString.subCategory) {
+                const subCategoryFilters = this.queryString.subCategory
+                    .split(',')
+                    .map((item) => item.trim());
+                query = query.find({
+                    $and: [
+                        { category: { $in: categoryFilters } }, // Parent category condition
+                        { subCategory: { $in: subCategoryFilters } }, // Subcategory condition
+                    ],
+                });
+            }
         }
         this.query = query;
         return this;
     }
-    sort() {
+    sort(defaultField = 'createdAt') {
         //2) sorting
         if (this.queryString.sort) {
             const sortBy = this.queryString.sort.split(',').join(' ');
             this.query = this.query.sort(sortBy);
         }
         else {
-            this.query = this.query.sort('addedAt');
+            this.query = this.query.sort(`${defaultField} _id`);
         }
         return this;
     }

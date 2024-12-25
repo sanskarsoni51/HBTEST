@@ -15,7 +15,7 @@ const getProductById = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
     const productId = req.params.productId;
     const result = yield productModel.findOne({ pid: productId });
     if (!result) {
-        return next(new AppError('Product not found', 404));
+        return next(new AppError("Product not found", 404));
     }
     res.status(200).json({
         message: "success",
@@ -26,12 +26,16 @@ const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, v
     const { productName, description, category, subCategory, price, status } = req.body;
     console.log("sb pura", productName, description, category, subCategory, price, status);
     // const nextPid: number = await productModel.getNextPid();
-    const lastDocument = yield productModel.findOne({}, {}, { sort: { 'pid': -1 } });
+    const lastDocument = yield productModel.findOne({}, {}, { sort: { pid: -1 } });
     const lastPid = lastDocument ? lastDocument.pid : 0;
     let images;
     // Check if files were uploaded
-    if (!req.files || !('images' in req.files)) {
-        images = [{ location: "https://haatbazaar-data.s3.ap-south-1.amazonaws.com/uploads/product_images/u_IMG_2712-1729278695387.jpeg" }];
+    if (!req.files || !("images" in req.files)) {
+        images = [
+            {
+                location: "https://haatbazaar-data.s3.ap-south-1.amazonaws.com/uploads/product_images/u_IMG_2712-1729278695387.jpeg",
+            },
+        ];
     }
     else {
         // Get the uploaded images
@@ -41,15 +45,15 @@ const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, v
     // Parse variants from stringified JSON
     let variants;
     try {
-        variants = JSON.parse(req.body.variants); // Assuming variants are received as a JSON string
+        variants = JSON.parse(req.body.variants);
     }
     catch (error) {
-        return res.status(400).json({ message: 'Invalid variants format' });
+        return res.status(400).json({ message: "Invalid variants format" });
     }
     // If you're expecting multiple images, you can store their paths in an array
     const imagePaths = images.map((image) => image.location);
     let qty = 0;
-    variants.map((s) => qty = qty + s.stock);
+    variants.map((s) => (qty = qty + s.stock));
     console.log(qty);
     const createdProduct = yield productModel.create({
         pid: lastPid + 1,
@@ -73,7 +77,7 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
     const { productName, description, category, subCategory, price, status } = req.body;
     let images;
     // Check if files were uploaded
-    if (!req.files || !('newImages' in req.files)) {
+    if (!req.files || !("newImages" in req.files)) {
         images = [{}];
     }
     else {
@@ -86,13 +90,12 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
         variants = JSON.parse(req.body.variants); // Assuming variants are received as a JSON string
     }
     catch (error) {
-        return res.status(400).json({ message: 'Invalid variants format' });
+        return res.status(400).json({ message: "Invalid variants format" });
     }
     const allImagePaths = [];
     // Ensure req.body.images is an array
-    if (req.body.images) {
+    if (req.body.images != null) {
         // Add existing images to the allImagePaths array
-        console.log("ok");
         const h = JSON.parse(req.body.images);
         console.log(h);
         h.forEach((e) => {
@@ -103,7 +106,7 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
     // If you're expecting multiple images, you can store their paths in an array
     const imagePaths = images.map((image) => image.location);
     let qty = 0;
-    variants.map((s) => qty = qty + s.stock);
+    variants.map((s) => (qty = qty + s.stock));
     console.log(qty);
     allImagePaths.push(...imagePaths);
     console.log("newpath", allImagePaths);
@@ -122,7 +125,7 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
         runValidators: true,
     });
     if (!updatedProduct) {
-        return next(new AppError('Product not found', 404));
+        return next(new AppError("Product not found", 404));
     }
     console.log(updatedProduct);
     res.status(200).json({
@@ -134,20 +137,22 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
 const updateProductImagesById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.productId;
     // Check if files were uploaded
-    if (!req.files || !('images' in req.files)) {
-        return res.status(400).json({ message: 'No images uploaded' });
+    if (!req.files || !("images" in req.files)) {
+        return res.status(400).json({ message: "No images uploaded" });
     }
     // Get the uploaded images
     const images = req.files["images"];
     // Get the paths of the uploaded images
-    const imagePaths = images.map((image) => { return image.location || ''; });
+    const imagePaths = images.map((image) => {
+        return image.location || "";
+    });
     const updatedProduct = yield productModel.findOneAndUpdate({ pid: productId }, { $push: { images: { $each: imagePaths } } }, {
         new: true,
         runValidators: true,
     });
     // Check if the product was not found
     if (!updatedProduct) {
-        return next(new AppError('Product not found', 404));
+        return next(new AppError("Product not found", 404));
     }
     // Send the updated product in the response
     res.status(200).json({
@@ -159,7 +164,7 @@ const deleteProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
     const productId = req.params.productId;
     const result = yield productModel.findOneAndDelete({ pid: productId });
     if (!result) {
-        return next(new AppError('Product not found', 404));
+        return next(new AppError("Product not found", 404));
     }
     res.status(204).json({
         message: "Product deleted successfully",
@@ -167,7 +172,7 @@ const deleteProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
 }));
 const getAllProducts = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const features = new APIFeatures(productModel.find(), req.query);
-    features.filter().sort().limitFields().paginate();
+    features.filter().sort("pid").limitFields().paginate();
     // console.log(req.query);
     const result = yield features.query;
     const limit = req.query.limit || 1;
@@ -186,10 +191,17 @@ const getAllProducts = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
     });
 }));
 const getNewProducts = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const newProducts = yield productModel.find().sort({ createdAt: -1 }).limit(10); // Assuming you have a 'createdAt' field
+    const newProducts = yield productModel.find().sort({ addedAt: -1 }).limit(10); // Assuming you have a 'createdAt' field
     res.status(200).json({
         message: "success",
         data: newProducts,
+    });
+}));
+const getBestSellers = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const bestSellers = yield productModel.find().sort({ totalSales: -1 }).limit(10);
+    res.status(200).json({
+        message: "success",
+        data: bestSellers,
     });
 }));
 const searchProducts = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -197,14 +209,14 @@ const searchProducts = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
     // Construct Mongoose query to search for products
     const results = yield productModel.find({
         $or: [
-            { productName: { $regex: query, $options: 'i' } }, // Case-insensitive search by name
+            { productName: { $regex: query, $options: "i" } }, // Case-insensitive search by name
             // { description: { $regex: query, $options: 'i' } }, // Case-insensitive search by description
             // You can add more fields to search here if needed
-        ]
+        ],
     });
     // If no products are found, return a 404 error
     if (results.length === 0) {
-        return next(new AppError('No products found', 404));
+        return next(new AppError("No products found", 404));
     }
     // Return search results
     res.status(200).json({
@@ -219,6 +231,7 @@ export default {
     deleteProductById,
     getAllProducts,
     getNewProducts,
+    getBestSellers,
     searchProducts,
-    updateProductImagesById
+    updateProductImagesById,
 };

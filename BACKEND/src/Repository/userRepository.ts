@@ -5,6 +5,7 @@ import AppError from "../utels/AppError.js";
 import APIFeatures from "../utels/apiFeatures.js";
 import { NewUserRequestBody } from "../types/requestBody.js";
 import catchAsync from "../utels/CatchAsync.js";
+import bcrypt from 'bcryptjs';
 
 
 const getUserById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -31,6 +32,11 @@ const createUser = catchAsync(async (req: Request<{},{},NewUserRequestBody>, res
 
 const updateUserById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.userId;
+  if (req.body.password) {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    req.body.password = hashedPassword; // Replace plain-text password with hashed password
+  }
+
   // console.log(req.body);
   const result = await userModel.findByIdAndUpdate(userId, req.body, {
     new: true,
@@ -96,7 +102,7 @@ const updateProfilePhoto = catchAsync(async (req: Request, res: Response, next: 
     runValidators: true
   });
   // console.log(result);
-  if (!result) {
+  if (!result) { 
     return next(new AppError('User not found', 404));
   }
   // result.profilePhoto = url;

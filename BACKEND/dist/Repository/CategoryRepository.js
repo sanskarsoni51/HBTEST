@@ -37,7 +37,6 @@ const deleteCategoryById = catchAsync((req, res, next) => __awaiter(void 0, void
 }));
 const updateCategoryById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const categoryId = req.params.categoryId;
-    // console.log(req.body);
     const result = yield categoryModel.findByIdAndUpdate(categoryId, req.body, {
         new: true,
         runValidators: true,
@@ -50,11 +49,9 @@ const updateCategoryById = catchAsync((req, res, next) => __awaiter(void 0, void
         data: result,
     });
 }));
-// Other category controller functions like updateCategory, deleteCategory, etc.
 export default {
     createCategory,
     getAllCategories,
     deleteCategoryById,
     updateCategoryById
-    // Add other category controller functions here
 };

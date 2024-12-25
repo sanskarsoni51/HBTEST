@@ -37,33 +37,31 @@ export const productApi = createApi({
   }),
   endpoints: (builder) => ({
     getCategories: builder.query<any, null>({
-      query: () => {
-        return {
-          url: `category`,
-          method: "GET",
-        };
-      },
+      query: () => ({
+        url: `category`,
+        method: "GET",
+      }),
     }),
     getProductsWithFilter: builder.mutation<
       IProductResponse,
       { category: string; sort: string; pageNumber: number; search?: string }
     >({
       query: ({ category, sort, pageNumber, search }) => {
-        let filterString = `/product?limit=${8}&page=${pageNumber}`;
-        if (category !== "") {
+        let filterString = `/product?limit=8&page=${pageNumber+1}`;
+        if (category) {
           filterString += `&category=${category}`;
         }
-        if (sort !== "") {
+        if (sort) {
           filterString += `&sort=${sort}`;
         }
-        if (search?.length != undefined && search.length >= 1) {
+        if (search?.length) {
           return {
             url: `/product/search?name=${search}`,
             method: "GET",
           };
         }
         return {
-          url: `${filterString}`,
+          url: filterString,
           method: "GET",
         };
       },
@@ -72,15 +70,14 @@ export const productApi = createApi({
       { message: string; data: ProductSchema },
       number
     >({
-      query: (id) => {
-        return {
-          url: `/product/${id}`,
-          method: "GET",
-        };
-      },
+      query: (id) => ({
+        url: `/product/${id}`,
+        method: "GET",
+      }),
     }),
     getBestSeller: builder.query<{ message: string; data: Array<any> }, null>({
       query: () => ({
+
         url: "/product/bestSellers",
         method: "GET",
       }),
@@ -96,6 +93,7 @@ export const productApi = createApi({
         url: "category/",
         method: "GET",
       }),
+
     }),
   }),
 });

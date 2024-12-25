@@ -12,6 +12,7 @@ import { userModel } from "../models/User.js";
 import AppError from "../utels/AppError.js";
 import APIFeatures from "../utels/apiFeatures.js";
 import catchAsync from "../utels/CatchAsync.js";
+import bcrypt from 'bcryptjs';
 const getUserById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
     const result = yield userModel.findById(userId);
@@ -33,6 +34,10 @@ const createUser = catchAsync((req, res, next) => __awaiter(void 0, void 0, void
 }));
 const updateUserById = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.userId;
+    if (req.body.password) {
+        const hashedPassword = yield bcrypt.hash(req.body.password, 10);
+        req.body.password = hashedPassword; // Replace plain-text password with hashed password
+    }
     // console.log(req.body);
     const result = yield userModel.findByIdAndUpdate(userId, req.body, {
         new: true,
