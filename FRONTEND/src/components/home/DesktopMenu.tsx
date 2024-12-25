@@ -12,125 +12,70 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useGetCategoryQuery } from "@/redux/api/prductsApi";
+import PageLoader from "../Loader/PageLoader";
 
-const menu = [
-  {
-      title: "Men",
-      submenu: [
-          {
-              title: "Rings",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Bracelate",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Chains",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
+interface SubCategory {
+  title: string;
+  hrf: string;
+  img: string;
+  desc: string;
+}
 
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "next.svg",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
-  },
-  {
-      title: "Female",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
-  },
-  {
-      title: "Traditional",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
-  },
-  {
-      title: "Immitated",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
-  },
-  {
-      title: "1g-Gold",
-      submenu: [
-          {
-              title: "Swords",
-              hrf:"/shop",
-              img: "",
-              desc:"sdfaidf f aisdfs dfisdgf isdhf hdf"
-          },
-      ]
-  }
-]
+interface MenuItem {
+  title: string;
+  submenu: SubCategory[];
+}
 
-export const DesktopMenu = () => {
+interface Category {
+  name: string;
+  subCategory: string[];
+  _id: string;
+}
+
+const DesktopMenu = () => {
+  const { data: categoryData, isLoading, isError } = useGetCategoryQuery(null);
+
+  if (isError) return;
+  if (isLoading) return;
+
+  const menu: MenuItem[] = categoryData.categories
+    .slice(0, 5)
+    .map((category: Category) => ({
+      title: category.name,
+      submenu: category.subCategory?.map((sub: string) => ({
+        title: sub,
+        hrf: `/shop?mainCategory=${encodeURIComponent(
+          category.name
+        )}&category=${encodeURIComponent(sub)}`,
+        desc: `Explore our range of ${sub}`,
+      })),
+    }));
+
   return (
     <NavigationMenu className="hidden md:flex">
       <NavigationMenuList>
-        {menu.map((item, index) => {
-          return (
-            <NavigationMenuItem key={index}>
-              <NavigationMenuTrigger className="bg-brown text-pale">
-                {item.title}
-              </NavigationMenuTrigger>
-              <NavigationMenuContent className="shadow-xl">
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {item.submenu?.map((e, i) => {
-                    return (
-                      <ListItem
-                        key={i}
-                        href={e.hrf}
-                        title={e.title}
-                        img={e.img}
-                      >
-                        {e.desc}
-                      </ListItem>
-                    );
-                  })}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          );
-        })}
+        {menu.map((item: MenuItem, index: number) => (
+          <NavigationMenuItem key={index}>
+            <NavigationMenuTrigger className="bg-brown text-pale">
+              {item.title}
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="shadow-xl">
+              <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                {item.submenu?.map((submenu: SubCategory, i: number) => (
+                  <ListItem
+                    key={i}
+                    href={submenu.hrf}
+                    title={submenu.title}
+                    img={submenu.img}
+                  >
+                    {submenu.desc}
+                  </ListItem>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        ))}
       </NavigationMenuList>
     </NavigationMenu>
   );
@@ -154,7 +99,7 @@ const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <Image src="/cat2.jpg" alt={title} width={32} height={32} />
+          {/* <Image src={img} alt={title} width={32} height={32} /> */}
           <div className="block ml-2">
             <div className="text-sm font-semibold leading-none">{title}</div>
             <p className="line-clamp-2 text-xs leading-snug text-gray-700 ">
@@ -167,3 +112,5 @@ const ListItem = React.forwardRef<
   );
 });
 ListItem.displayName = "ListItem";
+
+export default DesktopMenu;

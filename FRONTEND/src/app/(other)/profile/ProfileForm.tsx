@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUpdateProfileMutation } from "@/redux/api/userApi";
 import {
   Form,
@@ -9,57 +9,77 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TypeOf, z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { userSchema } from "@/schema/schema";
 
-const profileSchema = z
+// Validation schemas
+const nameSchema = z.object({
+  name: z.string().min(1, "Full name is required").max(100),
+});
+
+const passwordSchema = z
   .object({
-    name: z.string().min(1, "Full name is required").max(100),
-    email: z
-      .string()
-      .min(1, "Email address is required")
-      .email("Email Address is invalid"),
     password: z
       .string()
-      .min(1, "Password is required")
-      .min(8, "Password must be more than 8 characters")
-      .max(32, "Password must be less than 32 characters")
-      .or(z.string().max(0)),
-    passwordConfirm: z
-      .string()
-      .min(1, "Please confirm your password")
-      .or(z.string().max(0)),
+      .min(8, "Password must be at least 8 characters")
+      .max(32, "Password must be less than 32 characters"),
+    passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
-    path: ["passwordConfirm"],
     message: "Passwords do not match",
+    path: ["passwordConfirm"],
   });
 
-export type RegisterInput = TypeOf<typeof profileSchema>;
+const addressSchema = z.object({
+  address: z.object({
+    street: z.string().min(1, "Street is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    country: z.string().min(1, "Country is required"),
+    pinCode: z
+      .number()
+      .positive("PinCode must be positive")
+      .min(10000, "PinCode must have 5 digits")
+      .max(999999, "PinCode must have at most 6 digits"),
+  }),
+});
+
+export type NameInput = TypeOf<typeof nameSchema>;
+export type PasswordInput = TypeOf<typeof passwordSchema>;
+export type AddressInput = TypeOf<typeof addressSchema>;
 
 const ProfileForm = ({ user }: { user: userSchema }) => {
-  const form = useForm<z.infer<typeof profileSchema>>({
-    resolver: zodResolver(profileSchema),
+  const [isEditing, setIsEditing] = useState(false); // New state to toggle edit mode
+
+  const nameForm = useForm<z.infer<typeof nameSchema>>({
+    resolver: zodResolver(nameSchema),
+    defaultValues: { name: user.name || "" },
+  });
+
+  const passwordForm = useForm<z.infer<typeof passwordSchema>>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: { password: "", passwordConfirm: "" },
+  });
+
+  const addressForm = useForm<z.infer<typeof addressSchema>>({
+    resolver: zodResolver(addressSchema),
     defaultValues: {
-      name: user.name,
-      email: user.email,
-      password: "",
-      passwordConfirm: "",
+      address: user.address[0] || {
+        street: "",
+        city: "",
+        state: "",
+        country: "",
+        pinCode: "",
+      },
     },
   });
 
-  const {
-    reset,
-    handleSubmit,
-    formState: { isSubmitSuccessful },
-  } = form;
-
-  // 👇 Calling the Register Mutation
-  const [updateUser, { isLoading, isSuccess, error, isError }] =
+  const [updateUser, { isLoading, isSuccess, isError, error }] =
     useUpdateProfileMutation();
 
   useEffect(() => {
@@ -70,144 +90,283 @@ const ProfileForm = ({ user }: { user: userSchema }) => {
         duration: 2000,
       });
     }
-
     if (isError) {
-      if (error) {
-        toast({
-          title: "Update Failed",
-          description: `${error}`,
-          variant: "destructive",
-          duration: 2000,
-        });
-      } else {
-        toast({
-          title: "Network Error. Please try again.",
-          variant: "destructive",
-          duration: 2000,
-        });
-      }
+      toast({
+        title: "Update Failed",
+        description: `${error}`,
+        variant: "destructive",
+        duration: 2000,
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
+  }, [isSuccess, isError]);
 
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitSuccessful]);
-
-  const onSubmit: SubmitHandler<RegisterInput> = (values) => {
-    const arr = Object.entries(values).filter(
-      ([key, values]) => values !== "" && key != "email"
-    );
-    const obj = Object.fromEntries(arr);
-    updateUser(obj);
-  };
   return (
-    <>
-      <Form {...form}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="text-brown text-xl font-semibold"
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="my-3">
-                <FormLabel className="flex flex-row font-semibold">
-                  Email:
-                  <FormMessage className="ml-3 font-medium" />
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="tyler.durden@fightclub.com"
-                    disabled
+    <div className="container px-0">
+      <Button
+        onClick={() => setIsEditing(!isEditing)} // Toggle edit mode
+        className="mb-4"
+      >
+        {isEditing ? "Cancel Editing" : "Edit Profile"}
+      </Button>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left Side (Name and Password Cards) */}
+        <div>
+          {/* Name Section */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-xl font-semibold">
+                {!isEditing ? "Full Name" : "Update Name"}
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <Form {...nameForm}>
+                <form
+                  onSubmit={nameForm.handleSubmit((values) =>
+                    updateUser({ name: values.name })
+                  )}
+                >
+                  <FormField
+                    control={nameForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name:</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="John Doe"
+                            disabled={!isEditing} // Disable input if not editing
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="my-3">
-                <FormLabel className="flex flex-row font-semibold">
-                  Name:
-                  <FormMessage className="ml-3 font-medium" />
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Tyler Durden" />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem className="my-3">
-                <FormLabel className="flex flex-row font-semibold">
-                  Password:
-                  <FormMessage className="ml-3 font-medium" />
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="You don't talk about it."
-                    required={false}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="passwordConfirm"
-            render={({ field }) => (
-              <FormItem className="my-3">
-                <FormLabel className="flex flex-row font-semibold">
-                  Confirm Parrsword:
-                  <FormMessage className="ml-3 font-medium" />
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Can we have it again. Please?"
-                    required={false}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="passwordConfirm"
-            render={({ field }) => (
-              <FormItem className="my-3">
-                <FormLabel className="flex flex-row font-semibold">
-                  Confirm Parrsword:
-                  <FormMessage className="ml-3 font-medium" />
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Can we have it again. Please?"
-                    required={false}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <Button className="w-full mb-3" type="submit">
-            Update
-          </Button>
-        </form>
-      </Form>
-    </>
+                  {isEditing && (
+                    <Button className="mt-4" type="submit" disabled={isLoading}>
+                      Update Name
+                    </Button>
+                  )}
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+
+          {/* Password Section */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-xl font-semibold">
+                {!isEditing ? "Password" : "Update Password"}
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <Form {...passwordForm}>
+                <form
+                  onSubmit={passwordForm.handleSubmit((values) =>
+                    updateUser({ password: values.password })
+                  )}
+                >
+                  {!isEditing ? (
+                    <FormField
+                      control={passwordForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password:</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="password"
+                              placeholder="********"
+                              disabled={!isEditing} // Disable input if not editing
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <div>
+                      <FormField
+                        control={passwordForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>New Password:</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="password"
+                                placeholder="********"
+                                disabled={!isEditing} // Disable input if not editing
+                              />
+                            </FormControl>
+                            {/* {passwordForm.formState.errors.password && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {passwordForm.formState.errors.password.message}
+                              </p>
+                            )} */}
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={passwordForm.control}
+                        name="passwordConfirm"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm Password:</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="password"
+                                placeholder="********"
+                                disabled={!isEditing} // Disable input if not editing
+                              />
+                            </FormControl>
+                            {passwordForm.formState.errors.password && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {passwordForm.formState.errors.password.message}
+                              </p>
+                            )}
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  {isEditing && (
+                    <Button className="mt-4" type="submit" disabled={isLoading}>
+                      Update Password
+                    </Button>
+                  )}
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Side (Address Card) */}
+        <div>
+          {/* Address Section */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-xl font-semibold">
+                {!isEditing ? "Address" : "Update Address"}
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <Form {...addressForm}>
+                <form
+                  onSubmit={addressForm.handleSubmit((values) =>
+                    updateUser({ address: values.address })
+                  )}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={addressForm.control}
+                      name="address.street"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Street:</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="123 Main St"
+                              disabled={!isEditing} // Disable input if not editing
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addressForm.control}
+                      name="address.city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City:</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="City Name"
+                              disabled={!isEditing} // Disable input if not editing
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addressForm.control}
+                      name="address.state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>State:</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="State Name"
+                              disabled={!isEditing} // Disable input if not editing
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addressForm.control}
+                      name="address.country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Country:</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Country Name"
+                              disabled={!isEditing} // Disable input if not editing
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addressForm.control}
+                      name="address.pinCode"
+                      render={({ field }) => (
+                        <FormItem className="my-3">
+                          <FormLabel>Pin Code:</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              placeholder="123456"
+                              disabled={!isEditing} // Disable input if not editing
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          {addressForm.formState.errors.address?.pinCode && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {
+                                addressForm.formState.errors.address.pinCode
+                                  .message
+                              }
+                            </p>
+                          )}
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {isEditing && (
+                    <Button className="mt-4" type="submit" disabled={isLoading}>
+                      Update Address
+                    </Button>
+                  )}
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   );
 };
 

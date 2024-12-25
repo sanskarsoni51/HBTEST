@@ -5,9 +5,10 @@ import {
   UserIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
-import { DesktopMenu } from "./DesktopMenu";
+// import { DesktopMenu } from "./DesktopMenu";
 import Mobilebar from "./MobileMenu";
 import { ProfileButtonD } from "./ProfieButton";
+import DesktopMenu from "./DesktopMenu";
 
 const Navbar = () => {
   return (
@@ -18,7 +19,7 @@ const Navbar = () => {
         </Link>
         <DesktopMenu />
         <div className="flex justify-center gap-3 items-center text-gold ">
-          <Link href="/contactus">
+          <Link href="/payment">
             <MagnifyingGlassIcon className="h-[28px] w-[30px]  cursor-pointer"></MagnifyingGlassIcon>
           </Link>
           <Link href="/cart">

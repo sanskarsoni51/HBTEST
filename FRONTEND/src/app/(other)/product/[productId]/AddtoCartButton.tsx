@@ -3,22 +3,50 @@ import React from "react";
 import { ProductSchema, Variant } from "@/schema/schema";
 import { useAppSelector } from "@/redux/store";
 import { useAddToCartMutation } from "@/redux/api/cartApi";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
 interface Props {
   productToAdd: ProductSchema;
-  variant: Variant;
+  variant?: Variant; // Variant is optional but required for adding to cart
 }
-const AddtoCartButton = ({ productToAdd, variant }: Props) => {
-  const [AddToCart, { isSuccess, isError, error }] = useAddToCartMutation();
+
+const AddToCartButton = ({ productToAdd, variant }: Props) => {
+  const router = useRouter();
+  const [AddToCart, { isSuccess }] = useAddToCartMutation();
   const inCart = useAppSelector((state) => state.cart);
-  if (inCart.products[productToAdd.pid]) {
+  const isUser = useAppSelector((state) => state.auth.authState); // Assuming `auth` slice has `isLoggedIn` field
+
+  const isOutOfStock = productToAdd.qtyavailable <= 0;
+  const cartKey = `${productToAdd.pid}${variant?.color || ""}`;
+
+  if (!isUser) {
+    return <Button onClick={() => router.push("/login")}>Add to Cart</Button>;
+  }
+
+  if (isOutOfStock) {
     return (
       <Button
         onClick={() => {
-          redirect("/cart");
+          toast({
+            title: "Out of Stock",
+            description: "This product is currently unavailable.",
+            variant: "destructive",
+          });
+        }}
+        disabled
+      >
+        Out of Stock
+      </Button>
+    );
+  }
+
+  if (inCart.products[cartKey]) {
+    return (
+      <Button
+        onClick={() => {
+          router.push("/cart");
         }}
       >
         Go To Cart
@@ -27,15 +55,29 @@ const AddtoCartButton = ({ productToAdd, variant }: Props) => {
   } else {
     return (
       <Button
-        onClick={() => {
-          AddToCart({ pid: productToAdd.pid, variant: variant });
+        onClick={async () => {
+          if (!variant) {
+            toast({
+              title: "Please select a variant",
+              description:
+                "You must choose a product variant before adding it to the cart.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Call AddToCart with the expected payload
+          await AddToCart({
+            pid: productToAdd.pid,
+            variant,
+          });
+
           if (isSuccess) {
             toast({
               title: "Successfully Added to Cart",
             });
           }
         }}
-        className="w-[120px] text-brown bg-pale h-[30px]"
       >
         Add to Cart
       </Button>
@@ -43,4 +85,4 @@ const AddtoCartButton = ({ productToAdd, variant }: Props) => {
   }
 };
 
-export default AddtoCartButton;
+export default AddToCartButton;

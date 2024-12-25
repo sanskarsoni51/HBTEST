@@ -38,12 +38,12 @@ const CartCard = ({ cart }: props) => {
           <div className="w-full flex flex-row my-4">
             <span className="w-full text-left font-semibold">{`Price(${cart.totalQuantity})`}</span>
             <span className="w-full text-right">
-              {cart.totalPrice.toFixed(2)}
+              ₹ {cart.totalPrice.toFixed(0)}
             </span>
           </div>
           <div className="w-full flex flex-row my-4">
             <span className="w-full text-left font-semibold">{`GST(${3}%)`}</span>
-            <span className="w-full text-right">{cart.gst.toFixed(2)}</span>
+            <span className="w-full text-right">₹ {cart.gst.toFixed(0)}</span>
           </div>
           <div className="w-full flex flex-row my-4">
             <span className="w-full text-left font-semibold">{`Delivery Charges`}</span>
@@ -53,7 +53,7 @@ const CartCard = ({ cart }: props) => {
           <div className="w-full flex flex-row my-4 border-y-2 text-xl border-lbrown">
             <span className="w-full text-left font-bold">{`Total`}</span>
             <span className="w-full text-right">
-              {cart.payablePrice.toFixed(2)}
+              ₹ {cart.payablePrice.toFixed(0)}
             </span>
           </div>
 

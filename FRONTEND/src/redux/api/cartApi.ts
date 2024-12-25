@@ -1,7 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { userApi } from "./userApi";
 import { toast } from "@/components/ui/use-toast";
-import { REHYDRATE } from "redux-persist";
 import { setCart } from "../slice/cartSlice";
 import { CartSchema, Variant } from "@/schema/schema";
 
@@ -25,32 +23,18 @@ export const cartApi = createApi({
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          if ((await queryFulfilled).data.status == 401) {
-            toast({
-              title: "Please Login First",
-              variant: "destructive",
-              duration: 1000,
-            });
-          } else {
-            dispatch(setCart((await queryFulfilled).data.data as CartSchema));
-            // const cart = (await queryFulfilled).data.data;
-            // if (cart) {
-            //   dispatch(
-            //     setCart({
-            //       products: cart.products,
-            //       deliveryCharges: cart.deliveryCharges,
-            //       gst: cart.gst,
-            //       payablePrice: cart.payablePrice,
-            //       totalPrice: cart.totalPrice,
-            //       totalQuantity: cart.totalQuantity,
-            //       address:cart.shippingAddress
-            //     }),
-            //   );
-            // }
-          }
+          const response = await queryFulfilled;
+          dispatch(setCart(response.data.data as CartSchema));
+          toast({
+            title: "Success",
+            description: "Your product has been added to the cart.",
+            variant: "default",
+            duration: 1000,
+          });
         } catch (error) {
           toast({
             title: "Error",
+            description: "Failed to add product to cart.",
             variant: "destructive",
             duration: 1000,
           });
@@ -70,21 +54,18 @@ export const cartApi = createApi({
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          dispatch(setCart((await queryFulfilled).data.data as CartSchema));
-          // const cart = (await queryFulfilled).data.data;
-          // dispatch(
-          //   setCart({
-          //     products: cart.products,
-          //     deliveryCharges: cart.deliveryCharges,
-          //     gst: cart.gst,
-          //     payablePrice: cart.payablePrice,
-          //     totalPrice: cart.totalPrice,
-          //     totalQuantity: cart.totalQuantity,
-          //   }),
-          // );
+          const response = await queryFulfilled;
+          dispatch(setCart(response.data.data as CartSchema));
+          toast({
+            title: "Success",
+            description: "Your product has been removed from the cart.",
+            variant: "default",
+            duration: 1000,
+          });
         } catch (error) {
           toast({
             title: "Error",
+            description: "Failed to remove product from cart.",
             variant: "destructive",
             duration: 1000,
           });
@@ -96,7 +77,6 @@ export const cartApi = createApi({
       { itemId: number; quantity: number; variant: Variant }
     >({
       query({ itemId, quantity, variant }) {
-        // quantity is updated quantity.
         return {
           url: `/cart/changeQuantity`,
           method: "POST",
@@ -112,21 +92,29 @@ export const cartApi = createApi({
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          dispatch(setCart((await queryFulfilled).data.data as CartSchema));
-          // const cart = (await queryFulfilled).data.data;
-          // dispatch(
-          //   setCart({
-          //     products: cart.products,
-          //     deliveryCharges: cart.deliveryCharges,
-          //     gst: cart.gst,
-          //     payablePrice: cart.payablePrice,
-          //     totalPrice: cart.totalPrice,
-          //     totalQuantity: cart.totalQuantity,
-          //   }),
-          // );
+          const response = await queryFulfilled;
+          
+          const { status, message } = response.data;
+          if (status === 400) {
+            toast({
+              title: "Insufficient Stock",
+              description: message,
+              variant: "destructive",
+              duration: 1000,
+            });
+          } else {
+            dispatch(setCart(response.data.data as CartSchema));
+            toast({
+              title: "Success",
+              description: "The product quantity has been updated in your cart.",
+              variant: "default",
+              duration: 1000,
+            });
+          }
         } catch (error) {
           toast({
             title: "Error",
+            description: "Failed to update product quantity.",
             variant: "destructive",
             duration: 1000,
           });
@@ -137,7 +125,6 @@ export const cartApi = createApi({
 });
 
 export const {
-  // useAddAddressMutation,
   useAddToCartMutation,
   useRemoveFromCartMutation,
   useManipulateQuantityMutation,

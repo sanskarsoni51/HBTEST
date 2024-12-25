@@ -40,11 +40,19 @@ export const userApi = createApi({
           }
           await queryFulfilled;
           await dispatch(userApi.endpoints.getCart.initiate(null));
-        } catch (error) {
-          console.log(error);
+        } catch (error: any) {
+          if (error?.error.status === 401) {
+            const errorMessage = error?.error?.data?.message || "Please log in first";
+            toast({
+              title: errorMessage,
+              variant: "destructive",
+              duration: 2000,
+            });
+          }
         }
       },
     }),
+
     getCart: builder.query({
       query: () => {
         return {
@@ -57,25 +65,16 @@ export const userApi = createApi({
       },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
-          // const cart = (await queryFulfilled).data.data;
           dispatch(setCart((await queryFulfilled).data.data as CartSchema));
-          // console.log("data from api", cart);
-          // dispatch(
-          //   setCart({
-          //     products: cart.products,
-          //     deliveryCharges: cart.deliveryCharges,
-          //     gst: cart.gst,
-          //     payablePrice: cart.payablePrice,
-          //     totalPrice: cart.totalPrice,
-          //     totalQuantity: cart.totalQuantity,
-          //   }),
-          // );
-        } catch (error) {
-          toast({
-            title: "Error",
-            variant: "destructive",
-            duration: 1000,
-          });
+        } catch (error: any) {
+          if (error?.error.status === 401) {
+            const errorMessage = error?.data?.message || "Please log in first";
+            toast({
+              title: errorMessage,
+              variant: "destructive",
+              duration: 2000,
+            });
+          }
         }
       },
     }),
@@ -89,29 +88,59 @@ export const userApi = createApi({
           },
         };
       },
-    }),
-    updateProfile: builder.mutation<any, { name?: string; password?: string }>({
-      query: (profile: { name?: string; password?: string }) => {
-        return {
-          url: "/user/profile",
-          method: "PATCH",
-          body: profile,
-          headers: {
-            authorization: `Bearer ${sessionStorage.getItem("token")}`,
-          },
-        };
-      },
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-          await dispatch(userApi.endpoints.getUser.initiate(null));
         } catch (error: any) {
-          throw new Error(
-            error.message ? error.message : "Error occured updating user info."
-          );
+          if (error?.error.status === 401) {
+            const errorMessage = "Please log in first";
+            toast({
+              title: errorMessage,
+              variant: "default",
+              duration: 2000,
+            });
+          }
         }
       },
     }),
+    updateProfile: builder.mutation<any, { name?: string; password?: string; address?: { 
+      street: string; 
+      city: string; 
+      state: string; 
+      country: string; 
+      pinCode: number; 
+  } }>({
+    query: (profile) => {
+      return {
+        url: "/user/profile",
+        method: "PATCH",
+        body: profile,
+        headers: {
+          authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      };
+    },
+    async onQueryStarted(_args, { dispatch, queryFulfilled }) {
+      try {
+        await queryFulfilled;
+        // Refetch user profile to update auth state with address and other details
+        await dispatch(userApi.endpoints.getUser.initiate(null));
+      } catch (error: any) {
+        if (error?.error.status === 401) {
+          const errorMessage = "Please log in first";
+          toast({
+            title: errorMessage,
+            variant: "destructive",
+            duration: 2000,
+          });
+        }
+        throw new Error(
+          error?.error.message ? error?.error.message : "Error occurred updating user info."
+        );
+      }
+    },
+  }),
+  
     logoutUser: builder.query({
       query: () => {
         return {
@@ -128,6 +157,30 @@ export const userApi = createApi({
           url: "/order/createOrder",
           method: "POST",
           body: orderDetails,
+          headers: {
+            authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        };
+      },
+    }),
+    acceptPayment: builder.mutation<any, CreateOrderSchema>({
+      query(data) {
+        return {
+          method: "POST",
+          url: "/order/acceptPayment",
+          body: data,
+          headers: {
+            authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        };
+      },
+    }),
+    verifyPayment: builder.mutation<any, { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }>({
+      query(data) {
+        return {
+          method: "POST",
+          url: "/order/verifyPayment",
+          body: data,
           headers: {
             authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
@@ -161,7 +214,15 @@ export const userApi = createApi({
               role: user.role,
             })
           );
-        } catch (error) {
+        } catch (error: any) {
+          if (error?.error.status === 401) {
+            const errorMessage = "Please log in first";
+            toast({
+              title: errorMessage,
+              variant: "destructive",
+              duration: 2000,
+            });
+          }
           console.log(error);
         }
       },
@@ -174,6 +235,8 @@ export const {
   useUpdateProfileMutation,
   useLogoutUserQuery,
   useCreateOrderMutation,
+  useAcceptPaymentMutation,
+  useVerifyPaymentMutation,
   useLazyUserImageupdateQuery,
   useGetCartQuery,
   useGetOrderQuery,
