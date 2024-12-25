@@ -103,8 +103,8 @@ const addToCart = catchAsync(async (req: Request, res: Response, next: NextFunct
 	}
 
 	if (cart) {
-		if (cart.products && cart.products.has(pid)) {
-			const cartProduct = cart.products.get(pid);
+		if (cart.products && cart.products.has(pid + variant.color)) {
+			const cartProduct = cart.products.get(pid + variant.color);
 
 			// Check if the existing product's variants contain the selected variant color
 			const existingVariant = cartProduct?.variant.color === selectedVariant.color;
@@ -210,7 +210,6 @@ const updateCartQuantity = catchAsync(async (req: Request, res: Response, next: 
 	if (!cart) {
 		return next(new AppError("Cart not found", 404));
 	} else {
-		console.dir(variant);
 		// Check if the product is in the cart
 		if (cart.products && cart.products.has(pid + variant.color)) {
 			// Update the quantity of the product in the cart

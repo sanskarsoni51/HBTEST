@@ -93,8 +93,8 @@ const addToCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 
         return next(new AppError("Variant out of stock", 400));
     }
     if (cart) {
-        if (cart.products && cart.products.has(pid)) {
-            const cartProduct = cart.products.get(pid);
+        if (cart.products && cart.products.has(pid + variant.color)) {
+            const cartProduct = cart.products.get(pid + variant.color);
             // Check if the existing product's variants contain the selected variant color
             const existingVariant = (cartProduct === null || cartProduct === void 0 ? void 0 : cartProduct.variant.color) === selectedVariant.color;
             if (existingVariant) {
@@ -177,7 +177,6 @@ const updateCartQuantity = catchAsync((req, res, next) => __awaiter(void 0, void
         return next(new AppError("Cart not found", 404));
     }
     else {
-        console.dir(variant);
         // Check if the product is in the cart
         if (cart.products && cart.products.has(pid + variant.color)) {
             // Update the quantity of the product in the cart
