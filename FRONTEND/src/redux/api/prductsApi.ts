@@ -2,12 +2,31 @@ import { ProductSchema } from "@/schema/schema";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface IProductResponse {
+  products(products: any): unknown;
+  maxPage(maxPage: any): unknown;
   totalPages: number;
   data: ProductSchema[];
 }
 export interface IErrorresponse {
   statusCode?: string | null;
   message?: string | null;
+}
+interface SubCategory {
+  title: string;
+  hrf: string;
+  img: string;
+  desc: string;
+}
+
+interface MenuItem {
+  title: string;
+  submenu: SubCategory[];
+}
+
+interface Category {
+  name: string;
+  subCategory: string[];
+  _id: string;
 }
 
 export const productApi = createApi({
@@ -58,9 +77,23 @@ export const productApi = createApi({
     }),
     getBestSeller: builder.query<{ message: string; data: Array<any> }, null>({
       query: () => ({
+
+        url: "/product/bestSellers",
+        method: "GET",
+      }),
+    }),
+    getNewArrival: builder.query<{ message: string; data: Array<any> }, null>({
+      query: () => ({
         url: "/product/newProducts",
         method: "GET",
       }),
+    }),
+    getCategory: builder.query<any, null>({
+      query: () => ({
+        url: "category/",
+        method: "GET",
+      }),
+
     }),
   }),
 });
@@ -70,4 +103,6 @@ export const {
   useGetCategoriesQuery,
   useGetProductByIdQuery,
   useGetBestSellerQuery,
+  useGetNewArrivalQuery,
+  useGetCategoryQuery,
 } = productApi;

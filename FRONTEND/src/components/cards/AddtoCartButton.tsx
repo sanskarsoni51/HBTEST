@@ -1,67 +1,96 @@
 "use client";
-import React, { useEffect } from "react";
-import { Button } from "../ui/button";
-import { addToCart } from "@/redux/slice/cartSlice";
-import { ProductSchema } from "@/schema/schema";
-import { useAppDispatch, useAppSelector } from "@/redux/store";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { ProductSchema, Variant } from "@/schema/schema";
+import { useAppSelector } from "@/redux/store";
 import { useAddToCartMutation } from "@/redux/api/cartApi";
-import { toast } from "../ui/use-toast";
-import { redirect } from "next/navigation";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
 
 interface Props {
   productToAdd: ProductSchema;
+  variant?: Variant;
 }
-const AddtoCartButton = ({ productToAdd }: Props) => {
-  const [AddToCart, { isSuccess, isError, error }] = useAddToCartMutation();
-  const inCart = useAppSelector((state) => state.cart);
-  const router = useRouter();
-  if (isSuccess) {
-    toast({
-      title: "Successfully Added to Cart",
-      duration: 2000,
-    });
-  }
-  useEffect(() => {
-    console.log(`${productToAdd.pid}: ${productToAdd.variants}`);
-  });
 
-  if (inCart.products && inCart.products[productToAdd.pid]) {
+const AddToCartButton = ({ productToAdd, variant }: Props) => {
+  const router = useRouter();
+  const [AddToCart, { isSuccess }] = useAddToCartMutation();
+  const inCart = useAppSelector((state) => state.cart);
+  const isUser = useAppSelector((state) => state.auth.authState); // Assuming `auth` slice has `isLoggedIn` field
+
+  // Check if the product is out of stock
+  const isOutOfStock = productToAdd.qtyavailable <= 0;
+  const cartKey = `${productToAdd.pid}${variant?.color || ""}`;
+
+  // Auto-select the first variant
+  const defaultVariant = productToAdd.variants?.[0] || {
+    color: "default",
+    size: "default",
+  };
+
+  // If the user is not logged in, show the "Login" button
+  if (!isUser) {
     return (
       <Button
-        className="w-[120px] text-pale bg-lbrown h-[30px]"
-        onClick={() => {
-          router.push("/cart");
-        }}
-      >
-        Go To Cart
-      </Button>
-    );
-  } else {
-    return (
-      <Button
-        onClick={() => {
-          AddToCart({
-            pid: productToAdd.pid,
-            variant: {
-              color: productToAdd.variants
-                ? productToAdd.variants[0].color
-                : "no color",
-            },
-          });
-          if (isSuccess) {
-            toast({
-              title: "Successfully Added to Cart",
-            });
-          }
-        }}
+        onClick={() => router.push("/login")}
         className="w-[120px] text-brown bg-pale h-[30px]"
       >
         Add to Cart
       </Button>
     );
   }
+
+  // If the product is out of stock, show the "Out of Stock" button
+  if (isOutOfStock) {
+    return (
+      <Button
+        onClick={() => {
+          toast({
+            title: "Out of Stock",
+            description: "This product is currently unavailable.",
+            variant: "destructive",
+          });
+        }}
+        disabled
+        className="w-[120px] text-pale bg-lbrown h-[30px]"
+      >
+        Out of Stock
+      </Button>
+    );
+  }
+
+  // If the product is already in the cart, show the "Go To Cart" button
+  if (inCart.products[cartKey]) {
+    return (
+      <Button
+        onClick={() => {
+          router.push("/cart");
+        }}
+        className="w-[120px] text-pale bg-lbrown h-[30px]"
+      >
+        Go To Cart
+      </Button>
+    );
+  }
+
+  // Default case: Show the "Add to Cart" button
+  return (
+    <Button
+      onClick={async () => {
+        await AddToCart({ pid: productToAdd.pid, variant: defaultVariant });
+        if (isSuccess) {
+          toast({
+            title: "Add to Cart",
+            description: "This product is available.",
+            variant: "destructive",
+          });
+        }
+      }}
+      className="w-[120px] text-brown bg-pale h-[30px]"
+    >
+      Add to Cart
+    </Button>
+  );
 };
 
-export default AddtoCartButton;
+export default AddToCartButton;

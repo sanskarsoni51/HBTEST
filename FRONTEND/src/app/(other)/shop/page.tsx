@@ -16,6 +16,7 @@ import {
 import { ProductSchema } from "@/schema/schema";
 import { Input } from "@/components/ui/input";
 import PageLoader from "@/components/Loader/ShopLoader";
+import { Toaster } from "@/components/ui/toaster";
 
 const Shop = () => {
   const [product, setProduct] = useState<Array<ProductSchema> | null>(null);
@@ -25,7 +26,7 @@ const Shop = () => {
   const [page, setPage] = useState<number>(0);
   const [maxpage, setMaxPage] = useState<number>(0);
   const [cat, setCat] = useState<Array<{ name: string }> | null>(null);
-  const [showCategories, setShowCategories] = useState(false); // New state for category visibility
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   const [getProducts, { isSuccess, isError, isLoading, data, error }] =
     useGetProductsWithFilterMutation();
@@ -107,7 +108,7 @@ const Shop = () => {
   }
   if (isSuccess) {
     return (
-      <div className="flex flex-col md:flex-row justify-center h-500 items-start">
+      <div className="flex flex-col md:flex-row justify-center min-h-[500px] items-start">
         {/* Filters on the left */}
         <div className="flex flex-col gap-4 p-5 w-full md:w-1/4">
           <Input
@@ -122,30 +123,25 @@ const Shop = () => {
             Search
           </Button>
 
-          <Select onValueChange={handleFilter} value={filter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sort" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="-price">High to Low</SelectItem>
-              <SelectItem value="price">Low to High</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="hidden md:block">
+            <Select onValueChange={handleFilter} value={filter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="-price">High to Low</SelectItem>
+                <SelectItem value="price">Low to High</SelectItem>
+              </SelectContent>
+            </Select>
 
-          {/* Toggle button for showing/hiding categories */}
-          <Button onClick={() => setShowCategories(!showCategories)}>
-            {showCategories ? "Hide Categories" : "Show Categories"}
-          </Button>
-
-          {/* Conditionally render categories based on showCategories state */}
-          {showCategories && (
+            {/* Show Categories */}
             <div>
               <h2 className="font-bold">Categories</h2>
               <div className="flex flex-col gap-2">
                 {cat === null ? (
                   <span>Loading categories...</span>
                 ) : (
-                  cat.map((c, i) => (
+                  (showAllCategories ? cat : cat.slice(0, 5)).map((c, i) => (
                     <Button
                       key={i}
                       onClick={() => handleCategory(c.name)}
@@ -160,8 +156,52 @@ const Shop = () => {
                   ))
                 )}
               </div>
+
+              {/* Show More Button */}
+              {cat && cat.length > 5 && !showAllCategories && (
+                <Button
+                  className="mt-4 h-8"
+                  onClick={() => setShowAllCategories(true)}
+                >
+                  Show More
+                </Button>
+              )}
+              {showAllCategories && (
+                <Button
+                  className="mt-4 h-8"
+                  onClick={() => setShowAllCategories(false)}
+                >
+                  Show Less
+                </Button>
+              )}
             </div>
-          )}
+          </div>
+        </div>
+        <div className="fixed bottom-0 left-0 w-full bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.1)] flex justify-around px-4 py-2 z-50 md:hidden">
+          {/* Sort Dropdown */}
+          <Select onValueChange={handleFilter} value={filter}>
+            <SelectTrigger className="flex-1 mx-2">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="-price">High to Low</SelectItem>
+              <SelectItem value="price">Low to High</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Category Dropdown */}
+          <Select onValueChange={handleCategory} value={category}>
+            <SelectTrigger className="flex-1 mx-2">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              {cat?.map((c, i) => (
+                <SelectItem key={i} value={c.name}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Product display on the right */}
@@ -177,7 +217,7 @@ const Shop = () => {
           {maxpage > 1 && (
             <nav className="flex space-x-2 justify-center mb-5">
               <div className="flex overflow-x-auto no-scrollbar gap-2 px-2">
-                {/* Previous Button */}
+                {/* Pagination Controls */}
                 <Button
                   onClick={() => setPage(page > 0 ? page : 0)}
                   disabled={page === 0}
@@ -186,7 +226,6 @@ const Shop = () => {
                   {"<"}
                 </Button>
 
-                {/* First Page Button */}
                 <Button
                   onClick={() => setPage(0)}
                   className={`text-brown hover:text-white ${
@@ -196,12 +235,10 @@ const Shop = () => {
                   1
                 </Button>
 
-                {/* Ellipsis if there’s a gap after the first page */}
-                {page > 2 && maxpage > 4 && (
+                {page > 1 && maxpage > 4 && (
                   <span className="text-gray-500">...</span>
                 )}
 
-                {/* Previous Page Button */}
                 {page > 1 && page < maxpage && (
                   <Button
                     onClick={() => setPage(page - 1)}
@@ -213,7 +250,6 @@ const Shop = () => {
                   </Button>
                 )}
 
-                {/* Current Page Button */}
                 {page > 0 && page < maxpage - 1 && (
                   <Button
                     onClick={() => setPage(page)}
@@ -223,7 +259,6 @@ const Shop = () => {
                   </Button>
                 )}
 
-                {/* Next Page Button */}
                 {page < maxpage - 2 && (
                   <Button
                     onClick={() => setPage(page + 1)}
@@ -235,12 +270,10 @@ const Shop = () => {
                   </Button>
                 )}
 
-                {/* Ellipsis if there’s a gap before the last page */}
                 {page < maxpage - 3 && maxpage > 4 && (
                   <span className="text-gray-500">...</span>
                 )}
 
-                {/* Last Page Button */}
                 <Button
                   onClick={() => setPage(maxpage - 1)}
                   className={`text-brown hover:text-white ${
@@ -250,7 +283,6 @@ const Shop = () => {
                   {maxpage}
                 </Button>
 
-                {/* Next Button */}
                 <Button
                   onClick={() =>
                     setPage(page < maxpage - 1 ? page + 1 : maxpage - 1)

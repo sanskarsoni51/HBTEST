@@ -94,7 +94,7 @@ const Orders = ({ order }: { order: Array<OrderItem> }) => {
                   <div className="text-center md:text-left px-2">
                     <div className="font-semibold text-lg">Price</div>
                     <div className="text-sm">
-                      {o.cart.payablePrice.toFixed(2)}
+                      ₹ {o.cart.payablePrice.toFixed(2)}
                     </div>
                   </div>
                 </div>

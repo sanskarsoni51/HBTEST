@@ -65,7 +65,7 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
                   <div className="flex-grow mx-4">
                     {/* Product Info */}
                     <p className="text-lg font-semibold">
-                      {`${productData.product.productName}(${productData.variant.color})`}
+                      {`${productData.product.productName} (${productData.variant.color})`}
                     </p>
                     <Button
                       type="button"
@@ -127,7 +127,11 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
 
                     {/* Price */}
                     <p className="text-lg font-semibold">
-                      ₹{productData.quantity * productData.product.price} /-
+                      ₹
+                      {(
+                        productData.quantity * productData.product.price
+                      ).toFixed(0)}{" "}
+                      /-
                     </p>
                   </div>
                 </div>

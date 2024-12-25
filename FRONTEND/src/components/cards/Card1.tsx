@@ -32,8 +32,9 @@ function Card1({ product }: CardProps) {
           {product?.productName}
         </span>
       </Link>
-      <h4 className="text-sm">
-        Price:<span className="font-thin text-xs">Rs</span> {product?.price} /-
+      <h4 className="text-s">
+        Price:<span className="font-normal text-s"> ₹ </span>
+        {product?.price} /-
       </h4>
       <AddtoCartButton productToAdd={product} />
     </div>

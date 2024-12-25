@@ -94,8 +94,8 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
                         {quantity}
                       </p>
                       <p>
-                        <strong>Price: </strong>
-                        {price} x {quantity} = {price * quantity}
+                        <strong>Price: </strong>₹{price} x {quantity} = ₹
+                        {price * quantity}
                       </p>
                     </div>
                   </div>
@@ -107,17 +107,17 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
           <div className="mt-6">
             <h3 className="text-xl font-semibold mb-2">Price Breakdown:</h3>
             <div className="mb-2">
-              <strong>Subtotal: </strong> {subtotal.toFixed(2)}
+              <strong>Subtotal: </strong> ₹ {subtotal.toFixed(2)}
             </div>
             <div className="mb-2">
-              <strong>GST: </strong> {gst.toFixed(2)}
+              <strong>GST: </strong> ₹{gst.toFixed(2)}
             </div>
             <div className="mb-2">
-              <strong>Delivery Charges: </strong> {deliveryCharges}
+              <strong>Delivery Charges: </strong> ₹{deliveryCharges}
             </div>
             <hr className="my-4" />
             <div className="text-xl font-semibold">
-              <strong>Total Payable Price: </strong>{" "}
+              <strong>Total Payable Price: </strong> ₹
               {totalPayablePrice.toFixed(2)}
             </div>
           </div>

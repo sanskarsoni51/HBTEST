@@ -1,11 +1,8 @@
 export interface userSchema {
-  // uid: number;
   name: string;
   email: string;
   password: string;
   profilePhoto: string;
-  // createdAt: Date;
-  // blocked: boolean;
   address: Address[];
   role: "admin" | "user" | "none";
 }
@@ -18,11 +15,11 @@ export interface CartProductSchema {
   images: Array<string>;
   productName: string;
   description?: string;
-  // colors?: Array<string>;
   variant: Variant[];
 }
 
 export interface ProductSchema {
+ 
   pid: number;
   qtyavailable: number;
   price: number;
@@ -46,21 +43,23 @@ export interface Address {
 }
 
 export interface cartProducts {
-  product: CartProductSchema;
+  product: ProductSchema;
   quantity: number;
-  variant: { color: string };
+  variant: {
+    color: string;
+  };
 }
 
 export interface CartSchema {
   products: {
-    [productId: number]: cartProducts;
+    [key: string]: cartProducts; // Define keys as strings
   };
   deliveryCharges: number;
   gst: number;
   totalQuantity: number;
   totalPrice: number;
   payablePrice: number;
-  address: Address; // Add the address property here
+  address: string[];
 }
 
 export interface CustomerSchema {
@@ -76,7 +75,6 @@ export interface AdminSchema {
   products: Array<ProductSchema>;
   orders: Array<OrderSchema>;
   customers: Array<userSchema>;
-  // ... other basic properties
 }
 
 export interface AppPropsSchema {

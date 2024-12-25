@@ -1,114 +1,75 @@
-import {
-  CartProductSchema,
-  CartSchema,
-  ProductSchema,
-  cartProducts,
-} from "@/schema/schema";
+import { CartSchema, ProductSchema, Variant, cartProducts } from "@/schema/schema";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
-  cartApi,
-  useManipulateQuantityMutation,
-  useRemoveFromCartMutation,
-} from "../api/cartApi";
-import { toast } from "@/components/ui/use-toast";
 
 const initialState: CartSchema = {
   products: {},
-  address: { city: "", country: "", pinCode: 0, state: "", street: "" },
   deliveryCharges: 0,
   gst: 0,
   totalQuantity: 0,
   totalPrice: 0,
   payablePrice: 0,
+  address: [],
 };
+
+
+
 interface updateqty {
-  id: number;
+  id: string; // Use string to allow both productId and variant to form a unique key
   operation: "increment" | "decrement";
 }
+
 const cartSlice = createSlice({
   name: "Cart",
   initialState,
   reducers: {
-    addToCart(
-      state,
-      action: PayloadAction<{
-        prduct: CartProductSchema;
-        variant: { color: string };
-      }>
-    ) {
-      const productId = action.payload.prduct.pid;
-      if (productId in state.products) {
-        // If the product is already present then increment its quantity by one.
+    addToCart(state, action: PayloadAction<{ product: ProductSchema; variant: Variant }>) {
+      const { product, variant } = action.payload;
+      const cartKey = `${product.pid}-${variant.color}`;
+    
+      if (cartKey in state.products) {
+        state.products[cartKey].quantity++;
         state.totalQuantity++;
-        state.totalPrice += state.products[productId].product.price;
-        state.products[productId]["quantity"]++;
+        state.totalPrice += product.price;
       } else {
-        // Otherwise, Add new Product to the list with a default quantity of one.
-        let newProduct: cartProducts = {
-          product: action.payload.prduct,
+        state.products[cartKey] = {
+          product,
           quantity: 1,
-          variant: action.payload.variant,
+          variant,
         };
-
-        state.products[productId] = newProduct;
         state.totalQuantity++;
-        state.totalPrice += newProduct.product.price;
+        state.totalPrice += product.price;
       }
+    
+      // Update delivery charges, GST, and payable price
       state.deliveryCharges = 59;
       state.gst = Math.round((4 / 100) * state.totalPrice + Number.EPSILON);
       state.payablePrice = state.totalPrice + state.deliveryCharges + state.gst;
     },
+    
+
     updateQtyInCart(state, action: PayloadAction<updateqty>) {
-      const id: number = action.payload.id;
-      const operation = action.payload.operation;
+      const { id, operation } = action.payload;
       const currentValue = state.products[id].quantity;
+
       switch (operation) {
         case "increment":
-          if (currentValue < state.products[id].product.qtyavailable) {
-            state.products[id]["quantity"]++;
-            // dispatch(
-            //   cartApi.endpoints.manipulateQuantity.initiate({
-            //     itemId: id,
-            //     quantity: currentValue + 1,
-            //   }),
-            // );
-            // if (isSuccess) {
-            //   toast({
-            //     title: "Item added",
-            //     duration: 2000,
-            //   });
-            // }
-          } else {
-            toast({
-              title: "Item not in stock",
-              variant: "destructive",
-              duration: 2000,
-            });
-          }
+          state.products[id].quantity++;
           break;
         case "decrement":
           if (currentValue > 1) {
-            state.products[id]["quantity"]--;
-            // dispatch(
-            //   cartApi.endpoints.manipulateQuantity.initiate({
-            //     itemId: id,
-            //     quantity: currentValue - 1,
-            //   }),
-            // );
-          } else if (currentValue == 1) {
-            delete state.products[action.payload.id];
-            state.totalQuantity--;
-            state.totalPrice -= state.products[action.payload.id].product.price;
+            state.products[id].quantity--;
+          } else {
+            delete state.products[id]; // Remove item if quantity is 1
           }
           break;
         default:
           console.log("Invalid Operation!");
       }
-      state.totalPrice = Object.values(state.products).reduce(
-        (acc, item) => acc + item.product.price * item.quantity,
-        0
-      );
+
+      state.totalQuantity = Object.values(state.products).reduce((acc, item) => acc + item.quantity, 0);
+      state.totalPrice = Object.values(state.products).reduce((acc, item) => acc + item.product.price * item.quantity, 0);
     },
+
     setCart(state, action: PayloadAction<CartSchema>) {
       state.deliveryCharges = action.payload.deliveryCharges;
       state.gst = action.payload.gst;
@@ -121,5 +82,4 @@ const cartSlice = createSlice({
 });
 
 export default cartSlice.reducer;
-// Action creators
 export const { addToCart, updateQtyInCart, setCart } = cartSlice.actions;

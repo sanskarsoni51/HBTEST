@@ -38,8 +38,8 @@ const Logout = () => {
         gst: 0,
         totalQuantity: 0,
         totalPrice: 0,
-        address: { city: "", country: "", pinCode: 0, state: "", street: "" },
         payablePrice: 0,
+        address: [],
       })
     );
     redirect("/");

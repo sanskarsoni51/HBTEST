@@ -57,7 +57,7 @@ export function LoginInner() {
         variant: "default",
         duration: 1500,
       });
-      redirect(from);
+      redirect(from); // Ensure this works correctly in your context
     }
     if (isError) {
       toast({
@@ -67,8 +67,7 @@ export function LoginInner() {
         duration: 1500,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
+  }, [isSuccess, isError]);
 
   useEffect(() => {
     if (isSubmitSuccessful) {
@@ -76,6 +75,10 @@ export function LoginInner() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitSuccessful]);
+
+  useEffect(() => {
+    console.log({ isSuccess, isError, isLoading, error });
+  }, [isSuccess, isError, isLoading]);
 
   const onSubmit: SubmitHandler<LoginInput> = (data) => {
     loginUser({ email: data.email, password: data.password });

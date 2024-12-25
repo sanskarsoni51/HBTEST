@@ -11,10 +11,13 @@ const Product = ({ product }: { product: ProductSchema }) => {
   const [activeTab, setActiveTab] = useState("details");
   const [variant, setVariant] = useState<Variant>({ color: "" });
   useEffect(() => {
-    console.log("Product", variant);
-  }, [variant]);
+    // Auto-select the first variant on page load
+    if (product.variants && product.variants.length > 0) {
+      setVariant({ color: product.variants[0].color });
+    }
+  }, [product.variants]);
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-5 lg:p-10">
+    <div className="grid grid-cols-1 h-500 lg:grid-cols-2 gap-6 p-5 lg:p-12">
       {/* Product Image Section */}
       <div className="w-full flex justify-center items-center">
         <ProductCorousel images={product.images} />
@@ -22,7 +25,9 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
       {/* Product Details Section */}
       <div className="flex flex-col">
-        <h1 className="text-4xl font-bold mb-3">{product.productName}</h1>
+        <h1 className="text-4xl font-bold mb-3 capitalize">
+          {product.productName} ({variant.color})
+        </h1>
 
         {/* Rating */}
         <div className="flex items-center mb-4">
@@ -44,7 +49,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
           <div className="flex gap-2 mt-2">
             {product.variants &&
               product.variants.map(({ color }, index) => (
-                <label key={index} className="cursor-pointer">
+                <label key={index} className="cursor-pointer relative group">
                   <input
                     type="radio"
                     name="color"
@@ -65,6 +70,10 @@ const Product = ({ product }: { product: ProductSchema }) => {
                     } hover:border-gray-400`}
                     style={{ backgroundColor: color }}
                   ></span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 capitalize hidden group-hover:block bg-gray-700 text-white text-xs px-5 py-2 rounded">
+                    {color}
+                  </div>
                 </label>
               ))}
           </div>
@@ -82,19 +91,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
         </div>
 
         {/* Add to Cart and Favorite Buttons */}
-        <div className="flex flex-col gap-3 lg:flex-row">
-          <Button
-            onClick={() => {
-              toast({
-                title: "Feature will be available soon.",
-                variant: "destructive",
-                duration: 2000,
-              });
-            }}
-            variant="outline"
-          >
-            Add to Favorite
-          </Button>
+        <div className="hidden lg:flex flex-col gap-3 lg:flex-row">
           <AddtoCartButton productToAdd={product} variant={variant} />
         </div>
       </div>
@@ -102,14 +99,14 @@ const Product = ({ product }: { product: ProductSchema }) => {
       {/* Tabs Section */}
       <div className="mt-10 lg:col-span-2">
         <div className="flex justify-center mb-6">
-          <button
+          {/* <button
             className={`px-4 py-2 font-semibold ${
               activeTab === "details" ? "border-b-2 border-black" : ""
             }`}
             onClick={() => setActiveTab("details")}
           >
             The Details
-          </button>
+          </button> */}
           <button
             className={`px-4 py-2 font-semibold ${
               activeTab === "reviews" ? "border-b-2 border-black" : ""
@@ -130,7 +127,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
         {/* Tab Content */}
         <div className="border-t pt-4">
-          {activeTab === "details" && <div>The product details go here...</div>}
+          {/* {activeTab === "details" && <div>The product details go here...</div>} */}
 
           {activeTab === "reviews" && (
             <div className="flex justify-center items-center  bg-gray-100">
@@ -178,19 +175,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
       </div>
 
       {/* Sticky Bottom Section for Mobile */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg flex flex-col gap-3">
-        <Button
-          onClick={() => {
-            toast({
-              title: "Feature will be available soon.",
-              variant: "destructive",
-              duration: 2000,
-            });
-          }}
-          variant="outline"
-        >
-          Add to Favorite
-        </Button>
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg z-50 flex flex-col gap-3">
         <AddtoCartButton productToAdd={product} variant={variant} />
       </div>
     </div>

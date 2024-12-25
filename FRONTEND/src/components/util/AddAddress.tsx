@@ -60,47 +60,42 @@ const AddAddressForm = ({ onSubmit, initialValues }: AddAddressFormProps) => {
       >
         <FormItem>
           <FormLabel className="flex flex-row font-semibold">
-            Street:
-            <FormMessage className="ml-3 font-medium" />
+            <FormMessage className="ml-3 pb-10 font-medium" />
           </FormLabel>
           <FormControl>
-            <Input {...form.register("street")} placeholder="123 Main St" />
+            <Input {...form.register("street")} placeholder="Area and Street" />
           </FormControl>
         </FormItem>
         <FormItem>
           <FormLabel className="flex flex-row font-semibold">
-            City:
             <FormMessage className="ml-3 font-medium" />
           </FormLabel>
           <FormControl>
-            <Input {...form.register("city")} placeholder="New York" />
+            <Input {...form.register("city")} placeholder="City" />
           </FormControl>
         </FormItem>
         <FormItem>
           <FormLabel className="flex flex-row font-semibold">
-            State:
             <FormMessage className="ml-3 font-medium" />
           </FormLabel>
           <FormControl>
-            <Input {...form.register("state")} placeholder="California" />
+            <Input {...form.register("state")} placeholder="State" />
           </FormControl>
         </FormItem>
         <FormItem>
           <FormLabel className="flex flex-row font-semibold">
-            Country:
             <FormMessage className="ml-3 font-medium" />
           </FormLabel>
           <FormControl>
-            <Input {...form.register("country")} placeholder="USA" />
+            <Input {...form.register("country")} placeholder="Country" />
           </FormControl>
         </FormItem>
         <FormItem>
           <FormLabel className="flex flex-row font-semibold">
-            Pin Code:
             <FormMessage className="ml-3 font-medium" />
           </FormLabel>
           <FormControl>
-            <Input {...form.register("pinCode")} placeholder="123456" />
+            <Input {...form.register("pinCode")} placeholder="Pincode" />
           </FormControl>
         </FormItem>
         <Button className="w-full mb-3" type="submit">
