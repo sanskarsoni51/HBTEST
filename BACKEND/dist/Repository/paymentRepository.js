@@ -15,7 +15,7 @@ import { CartModel } from "../models/cart.js";
 dotenv.config({ path: "config.env" });
 const razorpay = new Razorpay({
     key_id: process.env.razorpay_key_id || "razorpay-key",
-    key_secret: process.env.razorpay_key_id || "razorpay-secret",
+    key_secret: process.env.razorpay_key_secret || "razorpay-secret",
 });
 const acceptPayment = CatchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.user && req.user._id) {
@@ -32,6 +32,8 @@ const acceptPayment = CatchAsync((req, res, next) => __awaiter(void 0, void 0, v
         currency: "INR",
         receipt: `receipt_${Date.now()}`,
     };
+    console.log(process.env.razorpay_key_id);
+    console.log(process.env.razorpay_key_secret);
     const order = yield razorpay.orders.create(options);
     console.log({ order });
     res.status(200).json({

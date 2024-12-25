@@ -9,7 +9,7 @@ dotenv.config({ path: "config.env" });
 
 const razorpay = new Razorpay({
 	key_id: process.env.razorpay_key_id || "razorpay-key",
-	key_secret: process.env.razorpay_key_id || "razorpay-secret",
+	key_secret: process.env.razorpay_key_secret || "razorpay-secret",
 });
 
 const acceptPayment = CatchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -27,7 +27,8 @@ const acceptPayment = CatchAsync(async (req: Request, res: Response, next: NextF
 		currency: "INR",
 		receipt: `receipt_${Date.now()}`,
 	};
-
+	console.log(process.env.razorpay_key_id);
+	console.log(process.env.razorpay_key_secret);
 	const order = await razorpay.orders.create(options);
 	console.log({ order });
 	res.status(200).json({
