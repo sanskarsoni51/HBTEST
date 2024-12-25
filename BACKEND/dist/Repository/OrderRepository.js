@@ -56,7 +56,6 @@ const createOrder = catchAsync((req, res, next) => __awaiter(void 0, void 0, voi
     const newNumericPart = (parseInt(numericPart) + 1).toString().padStart(4, "0"); // Increment and pad with zeros
     const newOrderId = `THB${newNumericPart}`;
     const { paymentId, paymentSignature, status, shippingAddress } = req.body;
-    console.log(paymentId, status, shippingAddress);
     const createdOrder = yield Order.create({
         orderId: newOrderId,
         userId: user,

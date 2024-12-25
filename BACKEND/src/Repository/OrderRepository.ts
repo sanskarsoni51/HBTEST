@@ -57,7 +57,6 @@ const createOrder = catchAsync(async (req: Request, res: Response, next: NextFun
 	const newOrderId = `THB${newNumericPart}`;
 
 	const { paymentId, paymentSignature, status, shippingAddress } = req.body;
-	console.log(paymentId, status, shippingAddress);
 
 	const createdOrder = await Order.create({
 		orderId: newOrderId,

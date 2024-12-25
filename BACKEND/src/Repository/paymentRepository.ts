@@ -21,16 +21,12 @@ const acceptPayment = CatchAsync(async (req: Request, res: Response, next: NextF
 	const payablePrice = cart?.payablePrice || 0;
 	const roundedPayablePrice = Math.round(payablePrice * 100) / 100;
 	const amount = roundedPayablePrice * 100;
-	console.log("coming in payments" + amount);
 	const options = {
 		amount,
 		currency: "INR",
 		receipt: `receipt_${Date.now()}`,
 	};
-	console.log(process.env.razorpay_key_id);
-	console.log(process.env.razorpay_key_secret);
 	const order = await razorpay.orders.create(options);
-	console.log({ order });
 	res.status(200).json({
 		message: "success",
 		data: order,

@@ -24,8 +24,6 @@ const getProductById = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
 }));
 const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { productName, description, category, subCategory, price, status } = req.body;
-    console.log("sb pura", productName, description, category, subCategory, price, status);
-    // const nextPid: number = await productModel.getNextPid();
     const lastDocument = yield productModel.findOne({}, {}, { sort: { pid: -1 } });
     const lastPid = lastDocument ? lastDocument.pid : 0;
     let images;
@@ -40,7 +38,6 @@ const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, v
     else {
         // Get the uploaded images
         images = req.files["images"];
-        console.log("images", images);
     }
     // Parse variants from stringified JSON
     let variants;
@@ -54,7 +51,6 @@ const createProduct = catchAsync((req, res, next) => __awaiter(void 0, void 0, v
     const imagePaths = images.map((image) => image.location);
     let qty = 0;
     variants.map((s) => (qty = qty + s.stock));
-    console.log(qty);
     const createdProduct = yield productModel.create({
         pid: lastPid + 1,
         productName,
@@ -97,7 +93,6 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
     if (req.body.images != null) {
         // Add existing images to the allImagePaths array
         const h = JSON.parse(req.body.images);
-        console.log(h);
         h.forEach((e) => {
             allImagePaths.push(e);
         });
@@ -107,9 +102,7 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
     const imagePaths = images.map((image) => image.location);
     let qty = 0;
     variants.map((s) => (qty = qty + s.stock));
-    console.log(qty);
     allImagePaths.push(...imagePaths);
-    console.log("newpath", allImagePaths);
     const updatedProduct = yield productModel.findOneAndUpdate({ pid: productId }, {
         productName,
         description,
@@ -127,7 +120,6 @@ const updateProductById = catchAsync((req, res, next) => __awaiter(void 0, void 
     if (!updatedProduct) {
         return next(new AppError("Product not found", 404));
     }
-    console.log(updatedProduct);
     res.status(200).json({
         message: "success",
         data: updatedProduct,
