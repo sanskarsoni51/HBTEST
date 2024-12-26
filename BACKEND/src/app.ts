@@ -8,8 +8,6 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cookieParser from "cookie-parser";
 import cartRoutes from "./routes/cartRoutes.js";
-import https from "https";
-import fs from "fs";
 
 const app = express();
 app.use(express.json());
@@ -59,15 +57,7 @@ app.use("/uploads", express.static("uploads"));
 // handling all the errors that are not caught by specific handlers
 app.use(globalErrorHandler);
 
-const httpsOptions = {
-	key: fs.readFileSync("/etc/letsencrypt/live/thehaatbazaar.com/privkey.pem"), // Replace with the path to your private key
-	cert: fs.readFileSync("/etc/letsencrypt/live/thehaatbazaar.com/fullchain.pem "), // Replace with the path to your certificate
-};
-
 const port = 5000;
-// app.listen(port,()=>{
-//     console.log(`server is running at the port ${port}`);
-// })
-https.createServer(httpsOptions, app).listen(port, () => {
-	console.log(`Server is running at https://localhost:${port}`);
+app.listen(port, () => {
+	console.log(`server is running at the port ${port}`);
 });
