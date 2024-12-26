@@ -2,12 +2,14 @@ import express from "express";
 import mongoose from "./mongo.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
-import cors from 'cors';
-import globalErrorHandler from './Repository/errorRepository.js';
+import cors from "cors";
+import globalErrorHandler from "./Repository/errorRepository.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cookieParser from "cookie-parser";
 import cartRoutes from "./routes/cartRoutes.js";
+import https from "https";
+import fs from "fs";
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -31,22 +33,29 @@ app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
-mongoose.connection.on('error', (error) => {
-    console.error('Error connecting to MongoDB:', error);
+mongoose.connection.on("error", (error) => {
+    console.error("Error connecting to MongoDB:", error);
 });
-mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB');
+mongoose.connection.once("open", () => {
+    console.log("Connected to MongoDB");
 });
-//routes 
-app.use('/user', userRoutes);
-app.use('/product', productRoutes);
-app.use('/category', categoryRoutes);
-app.use('/order', orderRoutes);
-app.use('/cart', cartRoutes);
-app.use('/uploads', express.static('uploads'));
+//routes
+app.use("/user", userRoutes);
+app.use("/product", productRoutes);
+app.use("/category", categoryRoutes);
+app.use("/order", orderRoutes);
+app.use("/cart", cartRoutes);
+app.use("/uploads", express.static("uploads"));
 // handling all the errors that are not caught by specific handlers
 app.use(globalErrorHandler);
+const httpsOptions = {
+    key: fs.readFileSync("/etc/letsencrypt/live/thehaatbazaar.com/privkey.pem"), // Replace with the path to your private key
+    cert: fs.readFileSync("/etc/letsencrypt/live/thehaatbazaar.com/fullchain.pem "), // Replace with the path to your certificate
+};
 const port = 5000;
-app.listen(port, () => {
-    console.log(`server is running at the port ${port}`);
+// app.listen(port,()=>{
+//     console.log(`server is running at the port ${port}`);
+// })
+https.createServer(httpsOptions, app).listen(port, () => {
+    console.log(`Server is running at https://localhost:${port}`);
 });

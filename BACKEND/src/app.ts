@@ -1,27 +1,28 @@
-import express, {Request,Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import mongoose from "./mongo.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
-import cors from 'cors';
-import globalErrorHandler from './Repository/errorRepository.js';
+import cors from "cors";
+import globalErrorHandler from "./Repository/errorRepository.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cookieParser from "cookie-parser";
 import cartRoutes from "./routes/cartRoutes.js";
-
+import https from "https";
+import fs from "fs";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: true, // Allow requests from this origin
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization", "Cookie"], // Include 'credentials' in the list of allowed headers
-    credentials: true, // Allow credentials (cookies)
-  };
-  
-  app.use(cors(corsOptions));
+	origin: true, // Allow requests from this origin
+	methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+	allowedHeaders: ["Content-Type", "Authorization", "Cookie"], // Include 'credentials' in the list of allowed headers
+	credentials: true, // Allow credentials (cookies)
+};
+
+app.use(cors(corsOptions));
 // Handle preflight requests
 // app.options('*', cors({
 //     origin: true, // Allow requests from any origin
@@ -33,35 +34,40 @@ const corsOptions = {
 
 // app.use(cors(corsOptions));
 
-  
 app.use((req: Request, res: Response, next: NextFunction) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next();
-  });
-
-
-mongoose.connection.on('error', (error) => {
-    console.error('Error connecting to MongoDB:', error);
+	console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+	next();
 });
 
-mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB');
+mongoose.connection.on("error", (error) => {
+	console.error("Error connecting to MongoDB:", error);
 });
 
-//routes 
-app.use('/user',userRoutes);
-app.use('/product',productRoutes);
-app.use('/category',categoryRoutes);
-app.use('/order',orderRoutes);
-app.use('/cart',cartRoutes);
+mongoose.connection.once("open", () => {
+	console.log("Connected to MongoDB");
+});
 
-app.use('/uploads',express.static('uploads'));
+//routes
+app.use("/user", userRoutes);
+app.use("/product", productRoutes);
+app.use("/category", categoryRoutes);
+app.use("/order", orderRoutes);
+app.use("/cart", cartRoutes);
+
+app.use("/uploads", express.static("uploads"));
 
 // handling all the errors that are not caught by specific handlers
 app.use(globalErrorHandler);
 
+const httpsOptions = {
+	key: fs.readFileSync("/etc/letsencrypt/live/thehaatbazaar.com/privkey.pem"), // Replace with the path to your private key
+	cert: fs.readFileSync("/etc/letsencrypt/live/thehaatbazaar.com/fullchain.pem "), // Replace with the path to your certificate
+};
 
 const port = 5000;
-app.listen(port,()=>{
-    console.log(`server is running at the port ${port}`);
-})
+// app.listen(port,()=>{
+//     console.log(`server is running at the port ${port}`);
+// })
+https.createServer(httpsOptions, app).listen(port, () => {
+	console.log(`Server is running at https://localhost:${port}`);
+});
