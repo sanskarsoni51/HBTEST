@@ -124,7 +124,7 @@ const updateProductStockAndSales = (productsMap) => __awaiter(void 0, void 0, vo
         return;
     for (const [pid, cartProduct] of productsMap) {
         const { product, variant, quantity } = cartProduct;
-        const dbProduct = yield ProductModel.findOne({ pid });
+        const dbProduct = yield ProductModel.findOne({ pid: product.pid });
         if (!dbProduct) {
             throw new Error(`Product with pid ${pid} not found`);
         }

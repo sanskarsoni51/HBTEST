@@ -144,7 +144,7 @@ const updateProductStockAndSales = async (
 
 	for (const [pid, cartProduct] of productsMap) {
 		const { product, variant, quantity } = cartProduct;
-		const dbProduct = await ProductModel.findOne({ pid });
+		const dbProduct = await ProductModel.findOne({ pid: product.pid });
 		if (!dbProduct) {
 			throw new Error(`Product with pid ${pid} not found`);
 		}
