@@ -201,7 +201,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
                     <div className="text-sm text-gray-500">★★★★★</div>
                     <p className="text-gray-700 mt-4">
                       The necklace I ordered from The Hart Bazaar was the
-                      perfect gift for my best friend's birthday. She was over
+                      perfect gift for my best friends birthday. She was over
                       the moon when she received it, and the packaging was so
                       elegant too. It made her feel extra special, and I am
                       definitely coming back for more!
