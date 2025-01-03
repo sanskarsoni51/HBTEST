@@ -102,9 +102,12 @@ const addToCart = catchAsync(async (req: Request, res: Response, next: NextFunct
 		return next(new AppError("Variant out of stock", 400));
 	}
 
+	// Sanitize the key
+	const Key = sanitizeKey(pid + variant.color);
+
 	if (cart) {
-		if (cart.products && cart.products.has(pid + variant.color)) {
-			const cartProduct = cart.products.get(pid + variant.color);
+		if (cart.products && cart.products.has(Key)) {
+			const cartProduct = cart.products.get(Key);
 
 			// Check if the existing product's variants contain the selected variant color
 			const existingVariant = cartProduct?.variant.color === selectedVariant.color;
@@ -115,7 +118,7 @@ const addToCart = catchAsync(async (req: Request, res: Response, next: NextFunct
 
 		// Add the product variant to the cart
 		cart.products = cart.products || new Map();
-		cart.products.set(pid + variant.color, { product, variant: selectedVariant, quantity: 1 });
+		cart.products.set(Key, { product, variant: selectedVariant, quantity: 1 });
 
 		const productPrice = product.price;
 		cart.totalQuantity = (cart.totalQuantity || 0) + 1;
@@ -148,9 +151,11 @@ const removeFromCart = catchAsync(async (req: Request, res: Response, next: Next
 		return next(new AppError("Cart not found", 404));
 	}
 
+	// Sanitize the key
+	const Key = sanitizeKey(pid + selectedVariant.color);
 	// Check if the product is in the cart
-	if (cart.products && cart.products.has(pid + selectedVariant.color)) {
-		const cartProduct = cart.products.get(pid + selectedVariant.color);
+	if (cart.products && cart.products.has(Key)) {
+		const cartProduct = cart.products.get(Key);
 
 		if (!cartProduct) {
 			return next(new AppError("Product not found in cart", 404));
@@ -173,7 +178,7 @@ const removeFromCart = catchAsync(async (req: Request, res: Response, next: Next
 		const productPrice = product.price || 0;
 
 		// Remove the product from the cart
-		cart.products.delete(pid + selectedVariant.color);
+		cart.products.delete(Key);
 
 		// Update cart totals
 		cart.totalQuantity = cart.totalQuantity - productQuantity;
@@ -207,13 +212,16 @@ const updateCartQuantity = catchAsync(async (req: Request, res: Response, next: 
 		return next(new AppError("Product not found", 404));
 	}
 
+	// Sanitize the key
+	const Key = sanitizeKey(pid + variant.color);
+
 	if (!cart) {
 		return next(new AppError("Cart not found", 404));
 	} else {
 		// Check if the product is in the cart
-		if (cart.products && cart.products.has(pid + variant.color)) {
+		if (cart.products && cart.products.has(Key)) {
 			// Update the quantity of the product in the cart
-			const productDetails = cart.products.get(pid + variant.color);
+			const productDetails = cart.products.get(Key);
 			if (productDetails) {
 				const productVariant = product.variants.find((v) => v.color === variant.color);
 				if (!productVariant) {
@@ -269,6 +277,10 @@ const getMyCart = catchAsync(async (req: Request, res: Response, next: NextFunct
 		data: cart,
 	});
 });
+
+function sanitizeKey(key: string): string {
+	return key.replace(/\./g, "_"); // Replace all dots with underscores
+}
 
 export default {
 	getCartById,

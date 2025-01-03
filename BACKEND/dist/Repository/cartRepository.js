@@ -92,9 +92,11 @@ const addToCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 
     if (variant.stock <= 0) {
         return next(new AppError("Variant out of stock", 400));
     }
+    // Sanitize the key
+    const Key = sanitizeKey(pid + variant.color);
     if (cart) {
-        if (cart.products && cart.products.has(pid + variant.color)) {
-            const cartProduct = cart.products.get(pid + variant.color);
+        if (cart.products && cart.products.has(Key)) {
+            const cartProduct = cart.products.get(Key);
             // Check if the existing product's variants contain the selected variant color
             const existingVariant = (cartProduct === null || cartProduct === void 0 ? void 0 : cartProduct.variant.color) === selectedVariant.color;
             if (existingVariant) {
@@ -103,7 +105,7 @@ const addToCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 
         }
         // Add the product variant to the cart
         cart.products = cart.products || new Map();
-        cart.products.set(pid + variant.color, { product, variant: selectedVariant, quantity: 1 });
+        cart.products.set(Key, { product, variant: selectedVariant, quantity: 1 });
         const productPrice = product.price;
         cart.totalQuantity = (cart.totalQuantity || 0) + 1;
         cart.totalPrice = (cart.totalPrice || 0) + productPrice;
@@ -127,9 +129,11 @@ const removeFromCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
     if (!cart) {
         return next(new AppError("Cart not found", 404));
     }
+    // Sanitize the key
+    const Key = sanitizeKey(pid + selectedVariant.color);
     // Check if the product is in the cart
-    if (cart.products && cart.products.has(pid + selectedVariant.color)) {
-        const cartProduct = cart.products.get(pid + selectedVariant.color);
+    if (cart.products && cart.products.has(Key)) {
+        const cartProduct = cart.products.get(Key);
         if (!cartProduct) {
             return next(new AppError("Product not found in cart", 404));
         }
@@ -146,7 +150,7 @@ const removeFromCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, 
         const productQuantity = cartProduct.quantity || 1;
         const productPrice = product.price || 0;
         // Remove the product from the cart
-        cart.products.delete(pid + selectedVariant.color);
+        cart.products.delete(Key);
         // Update cart totals
         cart.totalQuantity = cart.totalQuantity - productQuantity;
         cart.totalPrice = cart.totalPrice - productPrice * productQuantity;
@@ -173,14 +177,16 @@ const updateCartQuantity = catchAsync((req, res, next) => __awaiter(void 0, void
     if (!product) {
         return next(new AppError("Product not found", 404));
     }
+    // Sanitize the key
+    const Key = sanitizeKey(pid + variant.color);
     if (!cart) {
         return next(new AppError("Cart not found", 404));
     }
     else {
         // Check if the product is in the cart
-        if (cart.products && cart.products.has(pid + variant.color)) {
+        if (cart.products && cart.products.has(Key)) {
             // Update the quantity of the product in the cart
-            const productDetails = cart.products.get(pid + variant.color);
+            const productDetails = cart.products.get(Key);
             if (productDetails) {
                 const productVariant = product.variants.find((v) => v.color === variant.color);
                 if (!productVariant) {
@@ -226,6 +232,9 @@ const getMyCart = catchAsync((req, res, next) => __awaiter(void 0, void 0, void 
         data: cart,
     });
 }));
+function sanitizeKey(key) {
+    return key.replace(/\./g, "_"); // Replace all dots with underscores
+}
 export default {
     getCartById,
     createCart,
