@@ -24,10 +24,13 @@ const AddToCartButton = ({ productToAdd, variant }: Props) => {
     size: "default",
   };
 
+  function sanitizeKey(key: string): string {
+    return key.replace(/\./g, "_"); // Replace all dots with underscores
+  }
   // Use provided variant or fallback to default
   const selectedVariant = variant || defaultVariant;
   const isOutOfStock = productToAdd.qtyavailable <= 0;
-  const cartKey = `${productToAdd.pid}${selectedVariant.color}`;
+  const cartKey = sanitizeKey(`${productToAdd.pid}${variant?.color || ""}`);
 
   if (!isUser) {
     return (

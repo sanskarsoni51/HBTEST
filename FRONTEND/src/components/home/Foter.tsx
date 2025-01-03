@@ -137,23 +137,23 @@ const Foter = () => {
               Useful links
             </h6>
             <p className="mb-4">
-              <a href="/product" className="text-pale ">
-                Products
+              <a href="/policy/T&c" className="text-pale ">
+                Terms and Conditions
               </a>
             </p>
             <p className="mb-4">
-              <a href="/profile" className="text-pale">
-                Profile
+              <a href="/policy/Privacy" className="text-pale">
+                Privacy Policy
               </a>
             </p>
             <p className="mb-4">
-              <a href="/orders" className="text-pale ">
-                Orders
+              <a href="/policy/Return" className="text-pale ">
+                Return and Cancellation Policy
               </a>
             </p>
             <p>
-              <a href="#!" className="text-pale ">
-                Help
+              <a href="/policy/Shipping" className="text-pale ">
+                Shipping Policy
               </a>
             </p>
           </div>
@@ -184,7 +184,7 @@ const Foter = () => {
                 <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
                 <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
               </svg>
-              contactus@thehaatbazaar.com
+              support@thehaatbazaar.com
             </p>
             <p className="mb-4 flex items-center justify-center md:justify-start">
               <svg

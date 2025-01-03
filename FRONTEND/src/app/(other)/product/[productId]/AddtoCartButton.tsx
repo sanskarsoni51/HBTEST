@@ -18,8 +18,12 @@ const AddToCartButton = ({ productToAdd, variant }: Props) => {
   const inCart = useAppSelector((state) => state.cart);
   const isUser = useAppSelector((state) => state.auth.authState); // Assuming `auth` slice has `isLoggedIn` field
 
+  function sanitizeKey(key: string): string {
+    return key.replace(/\./g, "_"); // Replace all dots with underscores
+  }
+
   const isOutOfStock = productToAdd.qtyavailable <= 0;
-  const cartKey = `${productToAdd.pid}${variant?.color || ""}`;
+  const cartKey = sanitizeKey(`${productToAdd.pid}${variant?.color || ""}`);
 
   if (!isUser) {
     return <Button onClick={() => router.push("/login")}>Add to Cart</Button>;

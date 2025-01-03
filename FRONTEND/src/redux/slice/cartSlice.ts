@@ -18,13 +18,17 @@ interface updateqty {
   operation: "increment" | "decrement";
 }
 
+function sanitizeKey(key: string): string {
+  return key.replace(/\./g, "_"); // Replace all dots with underscores
+}
+
 const cartSlice = createSlice({
   name: "Cart",
   initialState,
   reducers: {
     addToCart(state, action: PayloadAction<{ product: ProductSchema; variant: Variant }>) {
       const { product, variant } = action.payload;
-      const cartKey = `${product.pid}${variant.color}`;
+      const cartKey = sanitizeKey(`${product.pid}${variant.color}`);
     
       if (cartKey in state.products) {
         state.products[cartKey].quantity++;
