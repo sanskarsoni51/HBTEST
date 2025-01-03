@@ -42,12 +42,6 @@ export const userApi = createApi({
           await dispatch(userApi.endpoints.getCart.initiate(null));
         } catch (error: any) {
           if (error?.error.status === 401) {
-            const errorMessage = error?.error?.data?.message || "Please log in first";
-            toast({
-              title: errorMessage,
-              variant: "destructive",
-              duration: 2000,
-            });
           }
         }
       },

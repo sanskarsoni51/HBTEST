@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const Foter = () => {
   return (
@@ -90,6 +91,14 @@ const Foter = () => {
               </svg>
               The Haat Bazaar
             </h6>
+            {/* <Image
+              src="/Logo THB.svg"
+              // alt={""}
+              alt="A cute cat"
+              width={250}
+              height={50}
+              // className="mt-6 sm:mt-8 rounded-md w-[150px] aspect-[2/3] sm:w-[180px] object-cover"
+            /> */}
             <p>
               Discover the finest collection of artificial jewellery handcrafted
               in Udaipur. Combining elegance and tradition, our designs are

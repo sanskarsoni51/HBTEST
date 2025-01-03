@@ -95,6 +95,8 @@ export const cartApi = createApi({
           const response = await queryFulfilled;
           
           const { status, message } = response.data;
+          console.log(status,message);
+          
           if (status === 400) {
             toast({
               title: "Insufficient Stock",

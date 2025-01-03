@@ -27,11 +27,11 @@ export interface ProductSchema {
   images: Array<string>;
   productName: string;
   description?: string;
-  colors?: Array<string>;
   variants: Variant[];
 }
 export interface Variant {
   color: string;
+  
 }
 
 export interface Address {

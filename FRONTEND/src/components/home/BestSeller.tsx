@@ -25,7 +25,6 @@ const Bestseller = () => {
           images: p.images,
           description: p.description,
           qtyavailable: p.qtyavailable,
-          colors: p.colors,
           pid: p.pid,
           price: p.price,
           variants: p.variants,

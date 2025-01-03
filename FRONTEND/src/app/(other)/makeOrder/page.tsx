@@ -13,6 +13,8 @@ import AddAddressForm, { AddAddressInput } from "@/components/util/AddAddress";
 import { addAddress } from "@/redux/slice/orderSlice";
 import { Address } from "@/schema/schema";
 import Script from "next/script";
+import { CardFooter } from "@/components/ui/card";
+import Link from "next/link";
 
 declare global {
   interface Window {
@@ -34,6 +36,14 @@ const OrderPage = () => {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [acceptPayment] = useAcceptPaymentMutation();
   const [verifyPayment] = useVerifyPaymentMutation();
+  const [isEditable, setIsEditable] = useState(false);
+  const [voucherCode, setVoucherCode] = useState("HAPPYNEWCLIENT20");
+  const [showGiftMessage, setShowGiftMessage] = useState(false);
+
+  const handleSave = () => {
+    setShowGiftMessage(true);
+    setTimeout(() => setShowGiftMessage(false), 5000); // Hide message after 5 seconds
+  };
 
   useEffect(() => {
     setAddresses(user.address);
@@ -120,7 +130,6 @@ const OrderPage = () => {
                     duration: 2500,
                   });
 
-                  // Redirect using Next.js useRouter
                   router.push("/"); // Navigate to the homepage
                 } else {
                   throw new Error("Unexpected response message");
@@ -220,60 +229,72 @@ const OrderPage = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row md:space-x-4 px-4 py-6 bg-gray-100">
+    <div className="flex flex-col md:flex-row md:space-x-6 px-6 py-8 bg-gray-100">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
       {/* Account Section */}
       <div className="flex-grow">
-        <div className="bg-white p-6 mb-4 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-2">Account</h2>
-          <p className="mb-2">Name: {user.name}</p>
-          <p>Email: {user.email}</p>
+        <div className="bg-white p-6 mb-6 rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Account</h2>
+          <p className="text-lg mb-2 text-gray-700">
+            <span className="font-medium">Name:</span> {user.name}
+          </p>
+          <p className="text-lg text-gray-700">
+            <span className="font-medium">Email:</span> {user.email}
+          </p>
         </div>
 
         {/* Shipping Address Section */}
-        <div className="bg-white p-6 mb-4 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-2">Shipping Address</h2>
+        <div className="bg-white p-6 mb-6 rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">
+            Shipping Address
+          </h2>
           {addresses.map((a, index) => (
-            <div key={index} className="flex items-center mb-2">
+            <div key={index} className="flex items-center mb-3">
               <input
                 type="radio"
                 id={`address-${index}`}
                 name="shippingAddress"
                 checked={selectedAddress === a}
                 onChange={() => setSelectedAddress(a)}
-                className="mr-2"
+                className="mr-3 accent-gray-800"
               />
-              <label htmlFor={`address-${index}`}>
+              <label htmlFor={`address-${index}`} className="text-gray-700">
                 {a.street}, {a.city}, {a.state}, {a.country}, {a.pinCode}
               </label>
             </div>
           ))}
           <Button
             variant="outline"
+            className="border border-gray-300 py-2 px-4 rounded-lg text-gray-800 hover:bg-gray-100"
             onClick={() => setAddressFormVisible(!isAddressFormVisible)}
           >
             Add Address
           </Button>
           {isAddressFormVisible && (
-            <AddAddressForm onSubmit={handleAddressSubmit} />
+            <div className="mt-4">
+              <AddAddressForm onSubmit={handleAddressSubmit} />
+            </div>
           )}
         </div>
 
         {/* Payment Section */}
-        <div className="bg-white p-6 mb-4 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-2">Payment Information</h2>
-          <div className="mb-2">
+        <div className="bg-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">
+            Payment Information
+          </h2>
+          <div className="mb-3">
             <input
               type="radio"
               id="cod"
               name="payment"
               value="COD"
-              checked={paymentMethod === "COD"}
-              onChange={() => setPaymentMethod("COD")}
-              className="mr-2"
+              disabled // Make COD unclickable
+              className="mr-3 accent-gray-800 cursor"
             />
-            <label htmlFor="cod">Cash on Delivery</label>
+            <label htmlFor="cod" className="text-gray-700">
+              Cash on Delivery
+            </label>
           </div>
           <div>
             <input
@@ -283,27 +304,84 @@ const OrderPage = () => {
               value="Razorpay"
               checked={paymentMethod === "Razorpay"}
               onChange={() => setPaymentMethod("Razorpay")}
-              className="mr-2"
+              className="mr-3 accent-gray-800"
             />
-            <label htmlFor="razorpay">Razorpay</label>
+            <label htmlFor="razorpay" className="text-gray-700">
+              Razorpay
+            </label>
           </div>
         </div>
       </div>
 
       {/* Order Summary Section */}
-      <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-2">Summary</h2>
-        <p>Product Total: ₹{cart.totalPrice.toFixed(2)}</p>
-        <p>GST: ₹{cart.gst.toFixed(2)}</p>
-        <p>Shipping: ₹{cart.deliveryCharges}</p>
-        <p>Total: ₹{cart.payablePrice.toFixed(2)}</p>
-        <Button
-          className="w-full bg-blue-500 text-white py-2"
-          // disabled={isLoading}
-          onClick={handlePlaceOrder}
-        >
-          Place Order
-        </Button>
+      <div className="md:w-1/3 bg-white p-6 rounded-3xl shadow-xl">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 uppercase tracking-wide">
+          Order Summary
+        </h2>
+        <div className="mb-4 bg-gray-50 p-4 rounded-xl shadow-inner">
+          <p className="text-lg flex justify-between text-gray-700">
+            <span>Product Total:</span>{" "}
+            <span>₹{cart.totalPrice.toFixed(2)}</span>
+          </p>
+          <p className="text-lg flex justify-between text-gray-700">
+            <span>GST:</span> <span>₹{cart.gst.toFixed(2)}</span>
+          </p>
+          <p className="text-lg flex justify-between text-gray-700">
+            <span>Shipping Charges:</span> <span>₹{cart.deliveryCharges}</span>
+          </p>
+          <p className="text-lg font-bold flex justify-between border-t border-gray-300 pt-2 text-gray-900">
+            <span>Total (incl. VAT):</span>{" "}
+            <span>₹{cart.payablePrice.toFixed(2)}</span>
+          </p>
+        </div>
+        <div className="mb-6">
+          <h3 className="text-lg font-medium mb-2 text-gray-800">
+            Voucher Code
+          </h3>
+          <div className="flex items-center">
+            {isEditable ? (
+              <input
+                type="text"
+                value={voucherCode}
+                onChange={(e) => setVoucherCode(e.target.value)}
+                className="flex-grow border border-gray-300 rounded-lg py-2 px-4 text-gray-800"
+              />
+            ) : (
+              <p
+                className="flex-grow bg-gray-100 border border-gray-300 rounded-lg py-2 px-4 text-gray-800 cursor-pointer"
+                onClick={() => setIsEditable(true)}
+              >
+                {voucherCode}
+              </p>
+            )}
+            <Button
+              variant="outline"
+              className="ml-4 py-2 px-4 rounded-lg"
+              onClick={() => {
+                if (!showGiftMessage) {
+                  setShowGiftMessage(true);
+                  setIsEditable(false);
+                }
+              }}
+            >
+              {showGiftMessage ? "Applied" : "Apply"}
+            </Button>
+          </div>
+          {showGiftMessage && (
+            <p className="mt-2 text-brown font-medium">
+              Congratulations! We will send you a surprise with your order.
+            </p>
+          )}
+        </div>
+        <CardFooter>
+          <Link
+            href={""}
+            onClick={handlePlaceOrder}
+            className="w-full py-3 mt-4 rounded-xl text-center my-2 bg-brown text-pale"
+          >
+            Place Order
+          </Link>
+        </CardFooter>
       </div>
     </div>
   );

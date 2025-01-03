@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import {
   MagnifyingGlassIcon,
   ShoppingBagIcon,
@@ -14,8 +15,16 @@ const Navbar = () => {
   return (
     <div className="sticky z-10 bg-brown shadow-sm h-[52px] top-0 w-full px-5 py-2">
       <div className="flex justify-between items-center max-w-[1200px] mx-auto">
+        {/* <Image
+          src="/Logo THB.svg"
+          // alt={""}
+          alt="A cute cat"
+          width={50}
+          height={50}
+          // className="mt-6 sm:mt-8 rounded-md w-[150px] aspect-[2/3] sm:w-[180px] object-cover"
+        /> */}
         <Link href="/" className="text-gold font-bold text-xl">
-          HaatBazar
+          The Haat Bazaar
         </Link>
         <DesktopMenu />
         <div className="flex justify-center gap-3 items-center text-gold ">

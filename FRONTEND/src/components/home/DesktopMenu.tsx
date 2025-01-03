@@ -11,7 +11,6 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useGetCategoryQuery } from "@/redux/api/prductsApi";
 import PageLoader from "../Loader/PageLoader";
 
@@ -45,7 +44,7 @@ const DesktopMenu = () => {
       title: category.name,
       submenu: category.subCategory?.map((sub: string) => ({
         title: sub,
-        hrf: `/shop?mainCategory=${encodeURIComponent(
+        hrf: `/shop?Category=${encodeURIComponent(
           category.name
         )}&category=${encodeURIComponent(sub)}`,
         desc: `Explore our range of ${sub}`,

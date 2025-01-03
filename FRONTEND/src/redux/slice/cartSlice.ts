@@ -24,7 +24,7 @@ const cartSlice = createSlice({
   reducers: {
     addToCart(state, action: PayloadAction<{ product: ProductSchema; variant: Variant }>) {
       const { product, variant } = action.payload;
-      const cartKey = `${product.pid}-${variant.color}`;
+      const cartKey = `${product.pid}${variant.color}`;
     
       if (cartKey in state.products) {
         state.products[cartKey].quantity++;
@@ -71,12 +71,12 @@ const cartSlice = createSlice({
     },
 
     setCart(state, action: PayloadAction<CartSchema>) {
-      state.deliveryCharges = action.payload.deliveryCharges;
-      state.gst = action.payload.gst;
-      state.payablePrice = action.payload.payablePrice;
-      state.products = action.payload.products;
-      state.totalPrice = action.payload.totalPrice;
-      state.totalQuantity = action.payload.totalQuantity;
+      state.deliveryCharges = action.payload.deliveryCharges || 0;
+      state.gst = action.payload.gst || 0;
+      state.payablePrice = action.payload.payablePrice || 0;
+      state.products = action.payload.products || {}; // Ensure products is always an object
+      state.totalPrice = action.payload.totalPrice || 0;
+      state.totalQuantity = action.payload.totalQuantity || 0;
     },
   },
 });
