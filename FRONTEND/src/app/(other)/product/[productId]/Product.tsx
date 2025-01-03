@@ -45,7 +45,7 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
         {/* Color Selection */}
         <div className="mb-4">
-          <span className="font-semibold">Available Color:</span>
+          <span className="font-semibold">Available Colors:</span>
           <div className="flex gap-2 mt-2">
             {product.variants &&
               product.variants.map(({ color }, index) => (
@@ -62,16 +62,17 @@ const Product = ({ product }: { product: ProductSchema }) => {
                       }));
                     }}
                   />
-                  <span
-                    className={`inline-block w-6 h-6 rounded-full border-2 ${
+                  <div
+                    className={`flex items-center justify-center border-2 rounded-md ${
                       variant.color === color
                         ? "border-black"
-                        : "border-transparent"
-                    } hover:border-gray-400`}
-                    style={{ backgroundColor: color }}
-                  ></span>
+                        : "border-gray-300"
+                    } group-hover:bg-[${color}] transition-colors font-semibold px-4 py-2`}
+                  >
+                    <span className="capitalize">{color}</span>
+                  </div>
                   {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 capitalize hidden group-hover:block bg-gray-700 text-white text-xs px-5 py-2 rounded">
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-700 text-white text-xs px-3 py-1 rounded">
                     {color}
                   </div>
                 </label>
@@ -127,40 +128,97 @@ const Product = ({ product }: { product: ProductSchema }) => {
 
         {/* Tab Content */}
         <div className="border-t pt-4">
-          {/* {activeTab === "details" && <div>The product details go here...</div>} */}
-
           {activeTab === "reviews" && (
-            <div className="flex justify-center items-center  bg-gray-100">
+            <div className="flex justify-center items-center bg-white py-10">
               {/* Full Page Box for Reviews */}
-              <div className="max-w-6xl w-full bg-white shadow-lg rounded-lg p-6">
-                <h2 className="text-2xl font-semibold mb-4 text-center">
+              <div className="max-w-6xl w-full bg-white shadow-lg rounded-lg p-8">
+                <h2 className="text-3xl font-bold text-center text-black mb-6">
                   Customer Reviews
                 </h2>
 
                 {/* Container for Reviews */}
-                <div className="flex flex-wrap justify-between gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                   {/* Individual Review Boxes */}
-                  <div className="flex-1 min-w-[250px] p-4 border rounded-lg bg-gray-50">
-                    <div className="font-semibold">John Doe</div>
-                    <div className="text-sm text-gray-600">★★★★★</div>
-                    <p className="text-gray-700">
-                      Great product! Highly recommend.
+                  <div className="flex flex-col items-center p-6 border rounded-xl bg-white hover:shadow-md transition-shadow duration-300">
+                    <div className="font-semibold text-xl text-black">
+                      Surbhi Jain
+                    </div>
+                    <div className="text-sm text-gray-500">★★★★★</div>
+                    <p className="text-gray-700 mt-4">
+                      I recently bought a pair of earrings from The Hart Bazaar
+                      for a special occasion, and they exceeded my expectations.
+                      They are so versatile and can be worn with almost
+                      anything. I love the attention to detail in their designs!
                     </p>
                   </div>
 
-                  <div className="flex-1 min-w-[250px] p-4 border rounded-lg bg-gray-50">
-                    <div className="font-semibold">Jane Smith</div>
-                    <div className="text-sm text-gray-600">★★★★☆</div>
-                    <p className="text-gray-700">
-                      Very good quality, but a bit pricey.
+                  <div className="flex flex-col items-center p-6 border rounded-xl bg-white hover:shadow-md transition-shadow duration-300">
+                    <div className="font-semibold text-xl text-black">
+                      Ajit Rathore
+                    </div>
+                    <div className="text-sm text-gray-500">★★★★☆</div>
+                    <p className="text-gray-700 mt-4">
+                      Shopping for a gift for my wife has never been easier! The
+                      Hart Bazaar has an incredible collection of jewelry, and I
+                      found the perfect bracelet that matched her style. She was
+                      thrilled with the gift, and I could not be happier with
+                      the experience.
                     </p>
                   </div>
 
-                  <div className="flex-1 min-w-[250px] p-4 border rounded-lg bg-gray-50">
-                    <div className="font-semibold">Alice Johnson</div>
-                    <div className="text-sm text-gray-600">★★★★★</div>
-                    <p className="text-gray-700">
-                      I love it! It exceeded my expectations.
+                  <div className="flex flex-col items-center p-6 border rounded-xl bg-white hover:shadow-md transition-shadow duration-300">
+                    <div className="font-semibold text-xl text-black">
+                      Rajiv Gupta
+                    </div>
+                    <div className="text-sm text-gray-500">★★★★★</div>
+                    <p className="text-gray-700 mt-4">
+                      I was looking for something special to celebrate my
+                      anniversary, and I found the perfect necklace at The Hart
+                      Bazaar. The design is elegant, and the quality is
+                      outstanding. It was the perfect gift for my wife, and she
+                      could not stop smiling when she saw it!
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center p-6 border rounded-xl bg-white hover:shadow-md transition-shadow duration-300">
+                    <div className="font-semibold text-xl text-black">
+                      Metri Jain
+                    </div>
+                    <div className="text-sm text-gray-500">★★★★★</div>
+                    <p className="text-gray-700 mt-4">
+                      I wanted to surprise my husband with something meaningful
+                      for our anniversary, and The Hart Bazaar had the perfect
+                      watch! The design is sleek and stylish, and he absolutely
+                      loved it. It has become his favorite accessory, and I am
+                      so happy with how it turned out!
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center p-6 border rounded-xl bg-white hover:shadow-md transition-shadow duration-300">
+                    <div className="font-semibold text-xl text-black">
+                      Shivani Nitori
+                    </div>
+                    <div className="text-sm text-gray-500">★★★★★</div>
+                    <p className="text-gray-700 mt-4">
+                      The necklace I ordered from The Hart Bazaar was the
+                      perfect gift for my best friend's birthday. She was over
+                      the moon when she received it, and the packaging was so
+                      elegant too. It made her feel extra special, and I am
+                      definitely coming back for more!
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center p-6 border rounded-xl bg-white hover:shadow-md transition-shadow duration-300">
+                    <div className="font-semibold text-xl text-black">
+                      Anjali Viswa
+                    </div>
+                    <div className="text-sm text-gray-500">★★★★★</div>
+                    <p className="text-gray-700 mt-4">
+                      I bought a gorgeous pendant from The Hart Bazaar as a
+                      treat to myself, and I could not be more pleased! The
+                      quality is superb, and it has a timeless design that goes
+                      with any outfit. I have received so many compliments
+                      already!
                     </p>
                   </div>
                 </div>
@@ -169,7 +227,10 @@ const Product = ({ product }: { product: ProductSchema }) => {
           )}
 
           {activeTab === "discussion" && (
-            <div>Discussion forum goes here...</div>
+            <div className="bg-gradient-to-r from-[#f1e4d1] to-[#f1e4d1] text-[#4a3d29] p-10">
+              <h3 className="text-2xl font-semibold mb-4">Discussion Forum</h3>
+              <p className="text-lg">Coming soon...</p>
+            </div>
           )}
         </div>
       </div>

@@ -17,7 +17,7 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
   const calculateSubtotal = () => {
     if (!selectedOrder) return 0;
     return Object.keys(selectedOrder.cart.products).reduce((subtotal, key) => {
-      const productId = Number(key);
+      const productId = key;
       const product = selectedOrder.cart.products[productId].product;
       const quantity = selectedOrder.cart.products[productId].quantity;
       const price = selectedOrder.cart.products[productId].product.price;
@@ -68,7 +68,7 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
             <h3 className="text-xl font-semibold mb-2">Products:</h3>
             <div className="space-y-4">
               {Object.keys(selectedOrder.cart.products).map((key) => {
-                const productId = Number(key);
+                const productId = key;
                 const product = selectedOrder.cart.products[productId].product;
                 const quantity =
                   selectedOrder.cart.products[productId].quantity;

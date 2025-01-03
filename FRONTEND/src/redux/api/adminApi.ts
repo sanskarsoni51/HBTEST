@@ -32,10 +32,10 @@ export const adminApi = createApi({
           "category",
           productInfo.category ? JSON.stringify(productInfo.category) : "",
         );
-        formData.append(
-          "colors",
-          productInfo.colors ? JSON.stringify(productInfo.colors) : "",
-        );
+        // formData.append(
+        //   "colors",
+        //   productInfo.colors ? JSON.stringify(productInfo.colors) : "",
+        // );
         formData.append(
           "price",
           productInfo.price ? String(productInfo.price) : "0",

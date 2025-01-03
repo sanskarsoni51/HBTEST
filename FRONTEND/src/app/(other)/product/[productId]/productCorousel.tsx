@@ -9,21 +9,25 @@ import {
 import Image from "next/image";
 
 interface Props {
-  images: string[];
+  images: (string | null)[]; // Updated type to include null
 }
 
 const ProductCorousel = ({ images }: Props) => {
-  if (images.length == 0) {
+  // Filter out null or empty values from the images array
+  const validImages = images.filter((src) => src);
+
+  if (validImages.length === 0) {
     return <div>No images available</div>;
   }
+
   return (
     <Carousel className="w-full max-w-md">
       <CarouselContent>
-        {images.map((src, i) => (
+        {validImages.map((src, i) => (
           <CarouselItem key={i}>
             <div className="p-1 w-full h-[560px] flex justify-center items-center">
               <Image
-                src={src}
+                src={src as string} // Type assertion since we filtered nulls
                 alt={`Product image ${i + 1}`}
                 width={1000}
                 height={720}

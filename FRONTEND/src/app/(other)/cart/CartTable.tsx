@@ -56,6 +56,7 @@ const CartTable = ({ cart, updateCart }: CartProps) => {
                       <Image
                         src={productData.product.images[0]} // Assuming you have an image URL
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw,"
                         alt={productData.product.productName}
                         className="object-cover rounded"
                       />

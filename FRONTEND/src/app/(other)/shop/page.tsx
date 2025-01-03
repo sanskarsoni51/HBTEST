@@ -72,7 +72,6 @@ const Shop = () => {
           images: product.images,
           description: product.description,
           qtyavailable: product.qtyavailable,
-          colors: product.colors,
           pid: product.pid,
           price: product.price,
           variants: product.variants,

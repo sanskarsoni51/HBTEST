@@ -41,6 +41,7 @@
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "shadcn-ui": "^0.8.0",
+    "sharp": "^0.33.5",
     "table": "^6.8.2",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",

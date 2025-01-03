@@ -1,34 +1,34 @@
 "use client";
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { ProductSchema, Variant } from "@/schema/schema";
 import { useAppSelector } from "@/redux/store";
 import { useAddToCartMutation } from "@/redux/api/cartApi";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
 interface Props {
   productToAdd: ProductSchema;
-  variant?: Variant;
+  variant?: Variant; // Variant is optional but required for adding to cart
 }
 
 const AddToCartButton = ({ productToAdd, variant }: Props) => {
   const router = useRouter();
   const [AddToCart, { isSuccess }] = useAddToCartMutation();
   const inCart = useAppSelector((state) => state.cart);
-  const isUser = useAppSelector((state) => state.auth.authState); // Assuming `auth` slice has `isLoggedIn` field
+  const isUser = useAppSelector((state) => state.auth.authState);
 
-  // Check if the product is out of stock
-  const isOutOfStock = productToAdd.qtyavailable <= 0;
-  const cartKey = `${productToAdd.pid}${variant?.color || ""}`;
-
-  // Auto-select the first variant
+  // Default variant selection
   const defaultVariant = productToAdd.variants?.[0] || {
     color: "default",
     size: "default",
   };
 
-  // If the user is not logged in, show the "Login" button
+  // Use provided variant or fallback to default
+  const selectedVariant = variant || defaultVariant;
+  const isOutOfStock = productToAdd.qtyavailable <= 0;
+  const cartKey = `${productToAdd.pid}${selectedVariant.color}`;
+
   if (!isUser) {
     return (
       <Button
@@ -40,17 +40,16 @@ const AddToCartButton = ({ productToAdd, variant }: Props) => {
     );
   }
 
-  // If the product is out of stock, show the "Out of Stock" button
   if (isOutOfStock) {
     return (
       <Button
-        onClick={() => {
+        onClick={() =>
           toast({
             title: "Out of Stock",
             description: "This product is currently unavailable.",
             variant: "destructive",
-          });
-        }}
+          })
+        }
         disabled
         className="w-[120px] text-pale bg-lbrown h-[30px]"
       >
@@ -59,13 +58,10 @@ const AddToCartButton = ({ productToAdd, variant }: Props) => {
     );
   }
 
-  // If the product is already in the cart, show the "Go To Cart" button
   if (inCart.products[cartKey]) {
     return (
       <Button
-        onClick={() => {
-          router.push("/cart");
-        }}
+        onClick={() => router.push("/cart")}
         className="w-[120px] text-pale bg-lbrown h-[30px]"
       >
         Go To Cart
@@ -73,16 +69,16 @@ const AddToCartButton = ({ productToAdd, variant }: Props) => {
     );
   }
 
-  // Default case: Show the "Add to Cart" button
   return (
     <Button
       onClick={async () => {
-        await AddToCart({ pid: productToAdd.pid, variant: defaultVariant });
+        await AddToCart({ pid: productToAdd.pid, variant: selectedVariant });
+
         if (isSuccess) {
           toast({
-            title: "Add to Cart",
-            description: "This product is available.",
-            variant: "destructive",
+            title: "Successfully Added to Cart",
+            description: "The product has been added to your cart.",
+            variant: "default",
           });
         }
       }}
