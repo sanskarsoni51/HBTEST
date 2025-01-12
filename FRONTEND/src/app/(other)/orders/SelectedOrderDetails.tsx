@@ -18,9 +18,8 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
     if (!selectedOrder) return 0;
     return Object.keys(selectedOrder.cart.products).reduce((subtotal, key) => {
       const productId = key;
-      const product = selectedOrder.cart.products[productId].product;
-      const quantity = selectedOrder.cart.products[productId].quantity;
       const price = selectedOrder.cart.products[productId].product.price;
+      const quantity = selectedOrder.cart.products[productId].quantity;
       return subtotal + price * quantity;
     }, 0);
   };
@@ -31,41 +30,70 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
   const totalPayablePrice = selectedOrder?.cart.payablePrice || 0;
 
   return (
-    <div className="px-4 pb-4">
+    <div>
       {selectedOrder ? (
-        <div className="bg-pale shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4">Order Details</h2>
+        <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-brown text-white p-6 text-center">
+            <h2 className="text-3xl font-bold">Order Summary</h2>
+          </div>
 
-          <div className="flex justify-between gap-6">
-            <div className="flex-1">
-              <div className="mb-2">
-                <strong>Order ID: </strong>
-                {selectedOrder.orderId}
-              </div>
-              <div className="mb-2">
-                <strong>Payment ID: </strong>
-                {selectedOrder.paymentId}
-              </div>
-              <div className="mb-2">
-                <strong>Status: </strong>
-                {selectedOrder.status}
-              </div>
+          {/* Order Info & Address */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6">
+            {/* Order Details */}
+            <div className="bg-gray-50 rounded-lg p-4 shadow-md">
+              <h3 className="text-xl font-semibold text-brown mb-4">
+                Order Information
+              </h3>
+              <p>
+                <strong>Order ID:</strong> {selectedOrder.orderId}
+              </p>
+              {/* <p>
+                <strong>Payment ID:</strong> {selectedOrder.paymentId}
+              </p> */}
+              <p>
+                <strong>Status:</strong>{" "}
+                <span
+                  className={`px-2 py-1 capitalize rounded text-white text-sm ${
+                    selectedOrder.status === "Completed"
+                      ? "text-green-500"
+                      : selectedOrder.status === "pending"
+                      ? "text-orange-500"
+                      : selectedOrder.status === "confirmed"
+                      ? "text-blue-500"
+                      : "text-green-500"
+                  }`}
+                >
+                  {selectedOrder.status === "pending"
+                    ? "Order Placed"
+                    : selectedOrder.status === "confirmed"
+                    ? "Ready to Dispatch"
+                    : selectedOrder.status}
+                </span>
+              </p>
             </div>
 
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold mb-2">Shipping Address:</h3>
+            {/* Address Details */}
+            <div className="bg-gray-50 rounded-lg p-4 shadow-md">
+              <h3 className="text-xl font-semibold text-brown mb-4">
+                Shipping Address
+              </h3>
+              <p>{selectedOrder.address.street}</p>
               <p>
-                {selectedOrder.address.street}, {selectedOrder.address.city}
+                {selectedOrder.address.city}, {selectedOrder.address.state}
               </p>
               <p>
-                {selectedOrder.address.state}, {selectedOrder.address.country} -{" "}
+                {selectedOrder.address.country} -{" "}
                 {selectedOrder.address.pinCode}
               </p>
             </div>
           </div>
 
-          <div className="mt-4">
-            <h3 className="text-xl font-semibold mb-2">Products:</h3>
+          {/* Products Table */}
+          <div className="p-6">
+            <h3 className="text-xl font-semibold text-brown mb-4">
+              Products in Your Order
+            </h3>
             <div className="space-y-4">
               {Object.keys(selectedOrder.cart.products).map((key) => {
                 const productId = key;
@@ -78,24 +106,28 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
                 return (
                   <div
                     key={productId}
-                    className="flex items-center border rounded-lg p-4"
+                    className="flex justify-between items-center bg-gray-100 rounded-md p-4 shadow-sm"
                   >
-                    {/* <img
-                      src={product.imageUrl} // assuming product has an imageUrl property
-                      alt={product.productName}
-                      className="w-16 h-16 object-cover rounded-md mr-4"
-                    /> */}
-                    <div>
-                      <h4 className="text-lg font-semibold">
-                        {product.productName}
-                      </h4>
-                      <p>
-                        <strong>Quantity: </strong>
-                        {quantity}
-                      </p>
-                      <p>
-                        <strong>Price: </strong>₹{price} x {quantity} = ₹
-                        {price * quantity}
+                    {/* Product Name */}
+                    <div className="flex items-center gap-4">
+                      {/* <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden">
+                        <img
+                          src={product.imageUrl || "/placeholder.png"}
+                          alt={product.productName}
+                          className="object-cover w-full h-full"
+                        />
+                      </div> */}
+                      <div>
+                        <p className="text-lg font-medium text-gray-700">
+                          {product.productName}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Price & Quantity */}
+                    <div className="text-right">
+                      <p className="text-md font-semibold text-gray-700">
+                        ₹{price} x {quantity} = ₹{price * quantity}
                       </p>
                     </div>
                   </div>
@@ -104,26 +136,30 @@ const SelectedOrderDetails: React.FC<SelectedOrderDetailsProps> = ({
             </div>
           </div>
 
-          <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-2">Price Breakdown:</h3>
-            <div className="mb-2">
-              <strong>Subtotal: </strong> ₹ {subtotal.toFixed(2)}
-            </div>
-            <div className="mb-2">
-              <strong>GST: </strong> ₹{gst.toFixed(2)}
-            </div>
-            <div className="mb-2">
-              <strong>Delivery Charges: </strong> ₹{deliveryCharges}
-            </div>
-            <hr className="my-4" />
-            <div className="text-xl font-semibold">
-              <strong>Total Payable Price: </strong> ₹
-              {totalPayablePrice.toFixed(2)}
+          {/* Price Breakdown */}
+          <div className="bg-gray-100 p-6">
+            <h3 className="text-xl font-semibold text-brown mb-4">
+              Price Breakdown
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>Subtotal:</div>
+              <div className="text-right">₹ {subtotal.toFixed(2)}</div>
+              <div>GST:</div>
+              <div className="text-right">₹ {gst.toFixed(2)}</div>
+              <div>Delivery Charges:</div>
+              <div className="text-right">₹ {deliveryCharges}</div>
+              <hr className="col-span-2 my-2" />
+              <div className="font-semibold">Total Payable Price:</div>
+              <div className="text-right font-semibold text-lg">
+                ₹ {totalPayablePrice.toFixed(2)}
+              </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-white shadow-lg rounded-lg p-6 text-center"></div>
+        <div className="text-center bg-gray-100 shadow-lg rounded-lg p-6">
+          <p className="text-lg text-gray-600">No order selected.</p>
+        </div>
       )}
     </div>
   );

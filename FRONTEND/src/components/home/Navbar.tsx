@@ -28,9 +28,9 @@ const Navbar = () => {
         </Link>
         <DesktopMenu />
         <div className="flex justify-center gap-3 items-center text-gold ">
-          <Link href="/payment">
+          {/* <Link href="/payment">
             <MagnifyingGlassIcon className="h-[28px] w-[30px]  cursor-pointer"></MagnifyingGlassIcon>
-          </Link>
+          </Link> */}
           <Link href="/cart">
             <ShoppingBagIcon className="h-[28px] w-[30px]  cursor-pointer"></ShoppingBagIcon>
           </Link>

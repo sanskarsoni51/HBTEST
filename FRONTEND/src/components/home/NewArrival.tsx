@@ -32,8 +32,8 @@ const NewArrival = () => {
         product.push(newProduct);
       });
       return (
-        <div>
-          <div className="flex flex-row items-center mt-10 md:w-[90%] md:mx-20 overflow-hidden">
+        <div className=" mb-10">
+          <div className="flex flex-row items-center mt-10  md:w-[90%] md:mx-20 overflow-hidden">
             <span className="text-black pl-5 text-xl font-semibold w-32">
               New Arrival
             </span>

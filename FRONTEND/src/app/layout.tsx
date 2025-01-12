@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Tinos, Duru_Sans } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/redux/redux-povide";
 import { Toaster } from "@/components/ui/toaster";
+import PageLoader from "@/components/Loader/ShopLoader";
 
-const inter = Poppins({ subsets: ["latin"], weight: ["500"] });
+const inter = Poppins({ subsets: ["latin"], weight: ["400"] });
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={inter.className + "bg-pale"}>
+        <PageLoader />
         <ReduxProvider>{children}</ReduxProvider>
         <Toaster />
       </body>

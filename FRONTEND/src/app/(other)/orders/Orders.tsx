@@ -2,106 +2,139 @@ import { Address, CartSchema } from "@/schema/schema";
 import React, { useState, useEffect } from "react";
 import SelectedOrderDetails from "./SelectedOrderDetails";
 import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+import { Minimize } from "lucide-react";
+import { CircleX } from "lucide-react";
 
-// Define the type for an individual order item
 type OrderItem = {
   orderId: string;
   cart: CartSchema;
   paymentId: string;
   status: string;
-  address: Address; // Address is included here
+  address: Address;
 };
 
 const Orders = ({ order }: { order: Array<OrderItem> }) => {
-  const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(
-    order[0] || null
-  );
-  const [currentPage, setCurrentPage] = useState(1); // Pagination state
-  const ordersPerPage = 4; // Set number of orders to display per page
-
-  // Calculate total pages
+  const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 4;
   const totalPages = Math.ceil(order.length / ordersPerPage);
-
-  // Get the current orders to display
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = order
     .slice()
     .reverse()
     .slice(indexOfFirstOrder, indexOfLastOrder);
-
   const handleOrderClick = (orderDetails: OrderItem) => {
-    setSelectedOrder(orderDetails);
+    // Toggle selection
+    if (selectedOrder?.orderId === orderDetails.orderId) {
+      setSelectedOrder(null); // Unselect order
+    } else {
+      setSelectedOrder(orderDetails); // Select order
+    }
   };
-
-  // Handle page change
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-
   useEffect(() => {
-    if (order.length > 0) {
-      setSelectedOrder(order[0]);
-    }
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        // Mobile view
+        setSelectedOrder(null);
+      } else {
+        // Desktop view
+        setSelectedOrder(order.slice().reverse()[0]);
+      }
+    };
+
+    handleResize(); // Set initial state
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, [order]);
 
   return (
-    <div className="w-full h-screen overflow-y-auto bg-gray-100 p-4 flex flex-col md:flex-row">
+    <div className="w-full overflow-y-auto p-2 bg-gray-100 flex flex-col md:flex-row">
       {/* Orders List */}
       <div className="w-full md:w-3/4 mb-6 md:mb-0">
-        <div className="bg-white shadow-lg rounded-lg p-6">
+        <div className="bg-white shadow-lg rounded-lg md:p-4 p-2">
           {currentOrders.map((o) => (
-            <div key={o.orderId}>
-              <div
-                className="bg-white shadow-md rounded-lg p-4 mb-6 flex flex-row items-center justify-between border border-gray-300 cursor-pointer"
-                onClick={() => handleOrderClick(o)}
-              >
-                {/* Product Image */}
-                <div className="flex items-center justify-center">
-                  {/* Displaying the first product's image */}
-                  {o.cart.products &&
-                    Object.values(o.cart.products).length > 0 && (
-                      <img
-                        src={
-                          Object.values(o.cart.products)[0].product.images[0]
-                        } // Use the first product's image URL
-                        alt="Product"
-                        className="h-24 w-24 object-cover rounded-md"
-                      />
-                    )}
+            <div
+              key={o.orderId}
+              className={`bg-white shadow-md rounded-lg p-4 mb-6 flex flex-col md:flex-row items-center justify-between border ${
+                selectedOrder?.orderId === o.orderId
+                  ? "border-brown bg-brown"
+                  : "border-gray-300"
+              }`}
+              onClick={() => handleOrderClick(o)}
+            >
+              {/* Product Image */}
+              <div className="flex items-center justify-center">
+                {o.cart.products &&
+                  Object.values(o.cart.products).length > 0 && (
+                    <img
+                      src={Object.values(o.cart.products)[0].product.images[0]}
+                      alt="Product"
+                      className="h-24 w-24 object-cover rounded-md"
+                    />
+                  )}
+              </div>
+
+              {/* Order Info */}
+              <div className="flex flex-row items-center justify-around w-full">
+                <div className="text-center md:text-left px-2">
+                  <div className="font-semibold text-lg">Order ID</div>
+                  <div className="text-sm">{o.orderId}</div>
                 </div>
 
-                {/* Order Info - Displaying in a row for all screen sizes */}
-                <div className="flex flex-row items-center justify-around w-full">
-                  <div className="text-center md:text-left px-2">
-                    <div className="font-semibold text-lg">Order ID</div>
-                    <div className="text-sm">{o.orderId}</div>
+                <div className="text-center md:text-left px-2">
+                  <div className="font-semibold text-lg">Status</div>
+                  <div
+                    className={`text-sm ${
+                      o.status === "Completed"
+                        ? "text-green-500"
+                        : o.status === "pending"
+                        ? "text-orange-500"
+                        : o.status === "confirmed"
+                        ? "text-blue-500"
+                        : "text-green-500"
+                    }`}
+                  >
+                    {o.status === "pending"
+                      ? "Order Placed"
+                      : o.status === "confirmed"
+                      ? "Ready to Dispatch"
+                      : o.status}
                   </div>
+                </div>
 
-                  <div className="text-center md:text-left px-2">
-                    <div className="font-semibold text-lg">Status</div>
-                    <div
-                      className={`text-sm ${
-                        o.status === "Completed"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {o.status}
-                    </div>
+                <div className="text-center md:text-left px-2">
+                  <div className="font-semibold text-lg">Price</div>
+                  <div className="text-sm">
+                    ₹ {o.cart.payablePrice.toFixed(2)}
                   </div>
+                </div>
 
-                  <div className="text-center md:text-left px-2">
-                    <div className="font-semibold text-lg">Price</div>
-                    <div className="text-sm">
-                      ₹ {o.cart.payablePrice.toFixed(2)}
-                    </div>
-                  </div>
+                {/* Toggle Icon */}
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent parent onClick
+                    handleOrderClick(o);
+                  }}
+                  className="text-brown hover:text-brown "
+                >
+                  {selectedOrder?.orderId === o.orderId ? (
+                    <CircleX />
+                  ) : (
+                    <ChevronDown />
+                  )}
                 </div>
               </div>
 
               {/* Conditionally render the selected order details on mobile */}
-              <div className="block md:hidden">
+              <div className="block md:hidden mt-4">
                 {selectedOrder?.orderId === o.orderId && (
                   <SelectedOrderDetails selectedOrder={selectedOrder} />
                 )}

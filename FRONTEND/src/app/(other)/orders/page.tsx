@@ -47,7 +47,7 @@ const Cart = () => {
 
   return (
     <div className="flex flex-col">
-      <span className="text-center w-full text-3xl py-2 font-bold">Orders</span>
+      <span className="text-center w-full h-12 text-3xl font-bold">Orders</span>
       <div className="flex lg:flex-row flex-col items-center justify-center">
         {/* Orders list */}
         <Orders order={order} /> {/* Pass the order data to Orders component */}

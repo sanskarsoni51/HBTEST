@@ -32,10 +32,10 @@ const Bestseller = () => {
         product.push(newProduct);
       });
       return (
-        <div>
+        <div className="mb-10">
           <div className="flex flex-row items-center mt-10 md:w-[90%] md:mx-20 overflow-hidden">
             <span className="text-black pl-5 text-xl font-semibold w-32">
-              Best Seller
+              Top Sellers
             </span>
             <div className="bg-black mx-5 h-[2px] w-full"></div>
           </div>

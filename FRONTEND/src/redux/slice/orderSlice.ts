@@ -5,7 +5,7 @@ import { CartSchema } from "@/schema/schema";
 const initialState: CreateOrderSchema = {
   shippingAddress: null,
   paymentId: "1313",
-  status: "pending",
+  status: "Order Placed",
 };
 
 const orderSlice = createSlice({

@@ -38,7 +38,6 @@ const registerSchema = z
 
 export type RegisterInput = TypeOf<typeof registerSchema>;
 
-// Main Function
 export function RegisterInner() {
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -56,8 +55,7 @@ export function RegisterInner() {
     formState: { isSubmitSuccessful },
   } = form;
 
-  // 👇 Calling the Register Mutation
-  const [registerUser, { isLoading, isSuccess, error, isError, data }] =
+  const [registerUser, { isLoading, isSuccess, error, isError }] =
     useRegisterUserMutation();
 
   useEffect(() => {
@@ -71,29 +69,40 @@ export function RegisterInner() {
     }
 
     if (isError) {
-      if (error) {
-        toast({
-          title: "Registration Failed",
-          description: `${error}`,
-          variant: "destructive",
-          duration: 2000,
-        });
-      } else {
-        toast({
-          title: "Network Error. Please try again.",
-          variant: "destructive",
-          duration: 2000,
-        });
+      if ("status" in error) {
+        const errorStatus = error?.status;
+
+        // Handle specific error statuses
+        if (error?.status === 400) {
+          toast({
+            title: "Email already Exist",
+            description: "Please use another email address",
+            variant: "destructive",
+            duration: 2000,
+          });
+        } else if (error?.status === 404) {
+          toast({
+            title: "Error 404",
+            description: "The requested resource could not be found.",
+            variant: "destructive",
+            duration: 2000,
+          });
+        } else {
+          toast({
+            title: "Network Error",
+            description: "Something went wrong. Please try again.",
+            variant: "destructive",
+            duration: 2000,
+          });
+        }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]);
+  }, [isError, isSuccess]);
 
   useEffect(() => {
     if (isSubmitSuccessful) {
       reset();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitSuccessful]);
 
   const onSubmit: SubmitHandler<RegisterInput> = (values) => {

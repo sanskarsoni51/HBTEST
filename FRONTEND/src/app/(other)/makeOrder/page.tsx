@@ -113,7 +113,8 @@ const OrderPage = () => {
                 | "processing"
                 | "shipped"
                 | "delivered"
-                | "cancelled", // Explicitly set the type to one of the allowed values
+                | "cancelled"
+                | "Order Placed", // Explicitly set the type to one of the allowed values
             };
 
             try {

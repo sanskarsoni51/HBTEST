@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export interface CreateOrderSchema {
   shippingAddress: AddAddressInput | null;
   paymentId: "1313";
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "Order Placed";
 }
 
 export const orderApi = createApi({
