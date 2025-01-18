@@ -6,7 +6,10 @@ import mongoose from "mongoose";
 
 dotenv.config({ path: "config.env" });
 
-const url = process.env.DatabaseUrl || "default-fallback-url";
+const DbUrl =
+	"mongodb+srv://sanskarsoni:haat@cluster0.pqibz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+const url = process.env.DatabaseUrl || DbUrl;
 
 mongoose.connect(url);
 
