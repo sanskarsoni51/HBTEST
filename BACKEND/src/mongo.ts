@@ -4,15 +4,12 @@ import mongoose from "mongoose";
 
 // const envPath = path.resolve(, '../.env'); // Adjust the path as needed
 
-dotenv.config({ path: 'config.env' });
+dotenv.config({ path: "config.env" });
 
-
-
-const url = process.env.DatabaseUrl || 'default-fallback-url';
-// const name = 'test';
+const url = process.env.DatabaseUrl || "default-fallback-url";
 
 mongoose.connect(url);
-  
+
 const db = mongoose.connection;
 
 //  const client = new MongoClient(url);
@@ -23,7 +20,7 @@ const db = mongoose.connection;
 //         console.log("connected to mongodb");
 //     } catch (err) {
 //         console.error('error connecting to mongoDB' , err);
-        
+
 //     }
 //  }
 
@@ -31,5 +28,5 @@ const db = mongoose.connection;
 //     return client.db(name);
 //  }
 
- export default mongoose;
- export {db};
+export default mongoose;
+export { db };
