@@ -1,15 +1,11 @@
 import dotenv from "dotenv";
-import path from "path";
 import mongoose from "mongoose";
 
 // const envPath = path.resolve(, '../.env'); // Adjust the path as needed
 
 dotenv.config({ path: "config.env" });
 
-const DbUrl =
-	"mongodb+srv://sanskarsoni:haat@cluster0.pqibz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
-const url = process.env.DatabaseUrl || DbUrl;
+const url = process.env.DatabaseUrl || "default-fallback-url";
 
 mongoose.connect(url);
 
