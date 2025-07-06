@@ -7,6 +7,7 @@ const Sevices = () => {
       style={{ backgroundImage: `url("/bg2.jpg")` }}
     >
       <ul className="w-full h-[150px] sm:h-[250px] md:h-[350px] lg:h-[450px] backdrop-blur-sm flex flex-row items-center justify-center space-x-6 md:space-x-10 lg:space-x-14 xl:space-x-20  px-2 max-w-[1200px] mx-auto">
+        <a href="/shop" className="h-full w-full">
         <li
           style={{ backgroundImage: `url("/s1.jpg")` }}
           className="rounded-md h-3/4 w-full bg-cover bg-center overflow-hidden sm:max-w-[110px] md:max-w-[160px] lg:max-w-[210px]"
@@ -15,6 +16,8 @@ const Sevices = () => {
             Exceptional Craftmanship
           </span>
         </li>
+        </a>
+        <a href="/shop" className="h-full w-full">
         <li
           style={{ backgroundImage: `url("/s2.jpg")` }}
           className="rounded-md h-3/4 w-full bg-cover bg-center overflow-hidden md:max-w-[160px] lg:max-w-[210px]"
@@ -23,6 +26,8 @@ const Sevices = () => {
             Traditional Design
           </span>
         </li>
+        </a>
+        <a href="/shop" className="h-full w-full">
         <li
           style={{ backgroundImage: `url("/s3.jpg")` }}
           className="rounded-md h-3/4 w-full bg-cover bg-center overflow-hidden md:max-w-[160px] lg:max-w-[210px]"
@@ -31,6 +36,8 @@ const Sevices = () => {
             TimeLess Design
           </span>
         </li>
+        </a>
+        <a href="/shop" className="h-full w-full">
         <li
           style={{ backgroundImage: `url("/s4.jpg")` }}
           className="rounded-md h-3/4 w-full bg-cover bg-center overflow-hidden md:max-w-[160px] lg:max-w-[210px] justify-center"
@@ -39,6 +46,7 @@ const Sevices = () => {
             Affordable Luxury
           </span>
         </li>
+        </a>
       </ul>
     </div>
   );
