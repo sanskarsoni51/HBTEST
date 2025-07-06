@@ -199,7 +199,7 @@ const Foter = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              +91 9887279510
+              +91 02957358074
             </p>
             <p className="flex items-center justify-center md:justify-start">
               <svg
@@ -214,7 +214,7 @@ const Foter = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              +91 8742077953
+              +91 8890411777
             </p>
           </div>
         </div>
